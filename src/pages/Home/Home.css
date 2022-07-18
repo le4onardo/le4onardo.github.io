@@ -1,0 +1,19 @@
+.home .container {
+    background-color: transparent;
+    max-width: 1460px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    
+}
+
+.home .container-title{
+    max-width: 60%;
+    font-size: 3rem;
+    margin-bottom: 3rem;
+}
+
+.home .container-description {
+    max-width: 50%;
+}

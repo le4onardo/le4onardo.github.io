@@ -1,0 +1,17 @@
+.navigation-bar {
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navigation-bar a{
+    color: white;
+    text-decoration: none;
+    flex-grow: 1;
+}
+
+.navigation-bar .home {
+    flex-grow: 6;
+}
