@@ -1,15 +1,31 @@
 import './NavigationBar.css';
+import githubIcon from '../../../media/github-icon.png';
+import linkedinIcon from '../../../media/linkedin-icon.png';
 
 const NavigationBar = () => {
+  console.log(githubIcon);
   return (
     <div className='navigation-bar'>
       <a className={'home'} href='/'>
-        Home
+        Source Code
       </a>
-      <a href='/portfolio'>Portfolio</a>
-      <a href='/experience'>Experience</a>
-      <a href='/about'>About me</a>
-      <a href='/blog'>Blog</a>
+      <a
+        href='https://github.com/le4onardo'
+        className='navigation-bar__link'
+        rel='noopener noreferrer'
+        target='_blank'
+      >
+        <img src={githubIcon} /> Portfolio
+      </a>
+      <a
+        href='/experience'
+        className='navigation-bar__link experience'
+        rel='noopener noreferrer'
+        target='_blank'
+      >
+        <img src={linkedinIcon} />
+        Experience
+      </a>
     </div>
   );
 };
