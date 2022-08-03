@@ -20,7 +20,10 @@ module.exports = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
-      { test: /\.(mov|mp4|jpe?g|png)$/, type: 'asset' }
+      { 
+        test: /\.(mov|mp4|jpe?g|png)$/, 
+        type: 'asset/resource' 
+      }
     ]
   },
   resolve: {
