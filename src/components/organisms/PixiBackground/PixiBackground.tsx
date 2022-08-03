@@ -7,7 +7,7 @@ import { CRTFilter } from 'pixi-filters';
 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
-  /*
+
   useEffect(() => {
     const app = new Application({
       view: canvasEl.current!,
@@ -25,7 +25,7 @@ const PixiBackground = () => {
       conty.y = 0;
       app.stage.addChild(conty);
 
-      const media = resources.video3.data as any;
+      const media = resources.video1.data as any;
 
       if (media.nodeName === 'VIDEO') {
         media.muted = true;
@@ -69,9 +69,9 @@ const PixiBackground = () => {
       conty.addChild(sprite);
     }
 
-    // app.loader.add(assets).load(main);
+    app.loader.add(assets).load(main);
   });
-*/
+
   return <canvas className='pixi-background' ref={canvasEl} />;
 };
 
