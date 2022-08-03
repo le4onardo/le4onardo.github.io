@@ -3,18 +3,19 @@ import './PixiBackground.css';
 import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
 import assets from '../../../assets';
 import AsciiFilter from 'pixi-ascii/src/AsciiFilter';
+import { CRTFilter } from 'pixi-filters';
 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
-
+  /*
   useEffect(() => {
     const app = new Application({
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       backgroundColor: 0x10101b,
-      width: 900,
-      height: 1000
+      width: 600,
+      height: 600
     });
     let sprite: Sprite;
     let texture: Texture;
@@ -24,7 +25,7 @@ const PixiBackground = () => {
       conty.y = 0;
       app.stage.addChild(conty);
 
-      const media = resources.video1.data as any;
+      const media = resources.video3.data as any;
 
       if (media.nodeName === 'VIDEO') {
         media.muted = true;
@@ -50,17 +51,27 @@ const PixiBackground = () => {
       const ascii = new AsciiFilter();
       ascii.size = 1;
       ascii.backgroundColor = [0.062, 0.062, 0.105, 1.0];
-      sprite.filters = [ascii];
+      const crtFilter = new CRTFilter({
+        noise: 0,
+        curvature: 0,
+        lineWidth: 0,
+        lineContrast: 0,
+        seed: 0,
+        time: 0,
+        vignetting: 0.55,
+        vignettingBlur: 0.3,
+        vignettingAlpha: 0.95
+      });
+      ascii.charIndexes = [
+        0, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
+      ];
+      sprite.filters = [crtFilter, ascii];
       conty.addChild(sprite);
     }
 
-    app.loader.add(assets).load(main);
-    window.onresize = () => {
-      sprite.scale.x = canvasEl.current!.clientWidth / texture.width;
-      sprite.scale.y = canvasEl.current!.clientWidth / texture.width;
-    };
+    // app.loader.add(assets).load(main);
   });
-
+*/
   return <canvas className='pixi-background' ref={canvasEl} />;
 };
 

@@ -1,21 +1,21 @@
 .main-layout {
-    max-width: 1220px;
+    max-width: 1200px;
     margin: auto;
-    position:relative;
-    padding: 0 20px;
-
+    position: relative;
+    padding: 0;
 }
 
 .main-layout-container {
     position: relative;
 }
 
-.pixi-background{
+.pixi-background {
     width: 700px;
-    height: 600px;
-    background-color: red;
+    height: 650px;
     right: 0;
+    top: 20px;
     position: absolute;
+    background-color: red;
 }
 
 
