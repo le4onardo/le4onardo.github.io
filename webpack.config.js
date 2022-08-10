@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
-  devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',  // FIX: increases bundle size to almost 5 MB
   module:{
       rules: [{
         test: /\.tsx?$/,

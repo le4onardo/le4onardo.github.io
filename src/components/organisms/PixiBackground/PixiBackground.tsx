@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
 import assets from '../../../assets';
@@ -78,4 +78,4 @@ const PixiBackground = () => {
   return <canvas className='pixi-background' ref={canvasEl} />;
 };
 
-export default React.memo(PixiBackground);
+export default memo(PixiBackground);
