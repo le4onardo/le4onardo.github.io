@@ -14,8 +14,8 @@ const PixiBackground = () => {
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       backgroundColor: 0x10101b,
-      width: 600,
-      height: 600
+      width: 900,
+      height: 700
     });
     let sprite: Sprite;
     let texture: Texture;
@@ -24,8 +24,9 @@ const PixiBackground = () => {
       conty.x = 0;
       conty.y = 0;
       app.stage.addChild(conty);
-
-      const media = resources.video1.data as any;
+      const randomVideo = 'video' + Math.ceil(Math.random() * 8);
+      console.log(randomVideo);
+      const media = resources[randomVideo].data as any;
 
       if (media.nodeName === 'VIDEO') {
         media.muted = true;
@@ -58,9 +59,9 @@ const PixiBackground = () => {
         lineContrast: 0,
         seed: 0,
         time: 0,
-        vignetting: 0.55,
+        vignetting: 0.5,
         vignettingBlur: 0.3,
-        vignettingAlpha: 0.95
+        vignettingAlpha: 0.9
       });
       ascii.charIndexes = [
         0, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
