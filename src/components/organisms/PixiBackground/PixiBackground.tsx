@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
 import assets from '../../../assets';
@@ -9,6 +9,8 @@ const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const randomVideo = 'video' + Math.ceil(Math.random() * 8);
+    console.log(randomVideo);
     const app = new Application({
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
@@ -24,8 +26,6 @@ const PixiBackground = () => {
       conty.x = 0;
       conty.y = 0;
       app.stage.addChild(conty);
-      const randomVideo = 'video' + Math.ceil(Math.random() * 8);
-      console.log(randomVideo);
       const media = resources[randomVideo].data as any;
 
       if (media.nodeName === 'VIDEO') {
@@ -70,10 +70,12 @@ const PixiBackground = () => {
       conty.addChild(sprite);
     }
 
-    app.loader.add(assets).load(main);
+    app.loader
+      .add(assets.filter(({ name }) => name === randomVideo))
+      .load(main);
   });
 
   return <canvas className='pixi-background' ref={canvasEl} />;
 };
 
-export default PixiBackground;
+export default React.memo(PixiBackground);
