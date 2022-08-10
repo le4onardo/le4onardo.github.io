@@ -8,13 +8,14 @@
     
 }
 
-.home .container-title{
-    max-width: 60%;
+.home .container-title {
+    max-width: 50%;
     font-size: 3rem;
     margin-bottom: 8rem;
     margin-top: 150px;
 }
 
 .home .container-description {
-    max-width: 50%;
+    max-width: 60%;
+    line-height: 1rem;
 }

@@ -8,7 +8,7 @@ const NavigationBar = () => {
   return (
     <div className='navigation-bar'>
       <a className={'home'} href='/'>
-        Source Code
+        <Glitcher text='Source Code' colorIntensity={0.3} intensity={1} />
       </a>
       <a
         href='https://github.com/le4onardo'
@@ -21,7 +21,7 @@ const NavigationBar = () => {
         <Glitcher text='Github' colorIntensity={0.3} intensity={1} />
       </a>
       <a
-        href='/experience'
+        href='https://www.linkedin.com/in/leonardo-julio-rios-aliaga-017687122'
         className='navigation-bar__link experience'
         rel='noopener noreferrer'
         target='_blank'

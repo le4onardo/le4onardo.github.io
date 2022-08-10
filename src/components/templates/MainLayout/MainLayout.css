@@ -12,10 +12,9 @@
 .pixi-background {
     width: 700px;
     height: 650px;
-    right: 0;
-    top: 20px;
+    right: -40px;
+    top: 40px;
     position: absolute;
-    background-color: red;
 }
 
 
