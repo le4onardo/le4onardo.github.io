@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Glitcher from './Glitcher';
+import Glitcher from 'text-glitcher';
 interface Props {
   text: React.ReactNode;
   classProps?: string;
