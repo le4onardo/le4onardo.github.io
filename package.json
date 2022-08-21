@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "pixi-ascii": "github:le4onardo/PixiAscii",
+    "pixi-ascii": "^1.0.0",
     "pixi-filters": "^4.1.6",
     "pixi.js": "^6.4.2",
     "prop-types": "^15.8.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0"
+    "react-router-dom": "^6.3.0",
+    "text-glitcher": "^1.0.0"
   },
   "scripts": {
     "start": "webpack serve --mode development --open",
