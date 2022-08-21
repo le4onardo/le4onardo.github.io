@@ -45,8 +45,8 @@ object-assign
  */
 
 /*!
- * @pixi/filter-adjustment - v4.1.3
- * Compiled Thu, 17 Jun 2021 19:33:56 UTC
+ * @pixi/filter-adjustment - v4.2.0
+ * Compiled Fri, 05 Aug 2022 19:53:35 UTC
  *
  * @pixi/filter-adjustment is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
