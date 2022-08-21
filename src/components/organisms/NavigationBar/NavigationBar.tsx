@@ -2,13 +2,20 @@ import './NavigationBar.css';
 import githubIcon from '../../../media/github-icon.png';
 import linkedinIcon from '../../../media/linkedin-icon.png';
 import Glitcher from '../../atoms/GlitcherHOC';
+import cvIcon from '../../../media/cv-icon.png';
 
 const NavigationBar = () => {
-  console.log(githubIcon);
   return (
     <div className='navigation-bar'>
-      <a className={'home'} href='/'>
-        <Glitcher text='Source Code' colorIntensity={0.3} intensity={1} />
+      <a
+        className={'home navigation-bar__link'}
+        href='https://docs.google.com/document/d/11ek2gR7W66aMLip-v5xD30T5KiThzfrACdcjJupOInk/edit?usp=sharing'
+        target='_blank'
+        rel='noopener noreferrer'
+        title='CV'
+      >
+        <img src={cvIcon} />
+        <Glitcher text='CV' colorIntensity={0.3} intensity={1} />
       </a>
       <a
         href='https://github.com/le4onardo'
@@ -22,7 +29,7 @@ const NavigationBar = () => {
       </a>
       <a
         href='https://www.linkedin.com/in/leonardo-julio-rios-aliaga-017687122'
-        className='navigation-bar__link experience'
+        className='navigation-bar__link'
         rel='noopener noreferrer'
         target='_blank'
         title='Linked In'
