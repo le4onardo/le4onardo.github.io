@@ -4,14 +4,13 @@
     
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    
-}
+    justify-content: space-evenly;    
+} 
 
 .home .container-title {
-    max-width: 50%;
+    max-width: 40%;
     font-size: 3rem;
-    margin-bottom: 8rem;
+    margin-bottom: 10rem;
     margin-top: 150px;
 }
 
