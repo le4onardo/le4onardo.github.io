@@ -1,22 +1,22 @@
 import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
-import assets from '../../../assets';
-import AsciiFilter from 'pixi-ascii/src/AsciiFilter';
+import { assets, crtConfig } from '../../../assets';
+import AsciiFilter from 'pixi-ascii';
 import { CRTFilter } from 'pixi-filters';
 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const randomVideo = 'video' + Math.ceil(Math.random() * 8);
+    const randomVideo = Math.ceil(Math.random() * 8);
     console.log(randomVideo);
     const app = new Application({
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       backgroundColor: 0x10101b,
-      width: 900,
+      width: 1200,
       height: 700
     });
     let sprite: Sprite;
@@ -26,7 +26,7 @@ const PixiBackground = () => {
       conty.x = 0;
       conty.y = 0;
       app.stage.addChild(conty);
-      const media = resources[randomVideo].data as any;
+      const media = resources['video' + randomVideo].data as any;
 
       if (media.nodeName === 'VIDEO') {
         media.muted = true;
@@ -59,9 +59,7 @@ const PixiBackground = () => {
         lineContrast: 0,
         seed: 0,
         time: 0,
-        vignetting: 0.5,
-        vignettingBlur: 0.3,
-        vignettingAlpha: 0.9
+        ...crtConfig[randomVideo - 1]
       });
       ascii.charIndexes = [
         0, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
@@ -70,9 +68,7 @@ const PixiBackground = () => {
       conty.addChild(sprite);
     }
 
-    app.loader
-      .add(assets.filter(({ name }) => name === randomVideo))
-      .load(main);
+    app.loader.add([assets[randomVideo - 1]]).load(main);
   });
 
   return <canvas className='pixi-background' ref={canvasEl} />;
