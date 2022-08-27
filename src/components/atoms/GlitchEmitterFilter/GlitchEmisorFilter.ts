@@ -91,7 +91,6 @@ export default class GlitchEmisorFilter extends GlitchFilter {
     this.red = this.getRandomRed(this.intensity);
     this.blue = this.getRandomBlue(this.intensity);
     this.green = this.getRandomGreen(this.intensity);
-    this.intensity = Math.max(this.intensity-0.002,0);
   };
 
   public startGlitch(duration= 0) {
