@@ -24,7 +24,7 @@ const PixiBackground = () => {
     let glitchCounter = 0;
     let crtFilter: CRTFilter;
     async function loadRandomVideo(sprite: Sprite, crtFilter: CRTFilter) {
-      const randomIndex = Math.floor(Math.random() * 8);
+      const randomIndex = Math.floor(Math.random() * assets.length);
       const media = document.createElement('video') as HTMLVideoElement;
       media.crossOrigin = '';
       media.src = assets[randomIndex].url;
