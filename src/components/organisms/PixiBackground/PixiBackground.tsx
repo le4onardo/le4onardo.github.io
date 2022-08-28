@@ -1,49 +1,66 @@
 import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
-import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
+import { Application, Sprite, Texture } from 'pixi.js';
 import { assets, crtConfig } from '../../../assets';
 import AsciiFilter from 'pixi-ascii';
-import { CRTFilter, ColorReplaceFilter } from 'pixi-filters';
+import { CRTFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../atoms/GlitchEmitterFilter/GlitchEmisorFilter';
 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const randomVideo = 4; //Math.ceil(Math.random() * 8);
-    console.log(randomVideo);
     const app = new Application({
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       // backgroundColor: 0x10101b,
-      width: 1000,
-      height: 600
+      width: 1200,
+      height: 700
     });
     let sprite: Sprite;
-    let texture: Texture;
-    function main(loader: Loader, resources: any) {
-      const media = resources['video' + randomVideo].data as any;
-
-      if (media.nodeName === 'VIDEO') {
-        media.muted = true;
-        media.autoplay = true;
-        media.loop = true;
-      }
-      texture = Texture.from(media);
-      sprite = new Sprite(texture);
+    let glitch: GlitchEmisorFilter;
+    let loading = false;
+    let glitchCounter = 0;
+    let crtFilter: CRTFilter;
+    async function loadRandomVideo(sprite: Sprite, crtFilter: CRTFilter) {
+      const randomIndex = Math.floor(Math.random() * 8);
+      const media = document.createElement('video') as HTMLVideoElement;
+      media.crossOrigin = '';
+      media.src = assets[randomIndex].url;
+      media.muted = true;
+      media.autoplay = true;
+      media.loop = true;
+      media.onloadeddata = function () {
+        crtFilter.vignetting = crtConfig[randomIndex].vignetting;
+        crtFilter.vignettingAlpha = crtConfig[randomIndex].vignettingAlpha;
+        crtFilter.vignettingBlur = crtConfig[randomIndex].vignettingBlur;
+        const texture = Texture.from(media);
+        sprite.texture = texture;
+        sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.75;
+        sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.75;
+        sprite.x = (1200 - sprite.width) / 2;
+        sprite.y = (700 - sprite.height) / 2;
+        setTimeout(() => (loading = false), 1000);
+        console.log('video loaded');
+      };
+      media.onerror = function () {
+        setTimeout(() => (loading = false), 1000);
+        console.log('video load failed');
+      };
+      console.log('load requested');
+      media.load();
+    }
+    function main() {
       const backSprite = new Sprite();
       backSprite.width = canvasEl.current!.clientWidth;
       backSprite.height = canvasEl.current!.clientHeight;
-
       app.stage.addChild(backSprite);
-      sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.8;
-      sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.8;
-      sprite.x = (1000 - sprite.width) / 2;
-      sprite.y = (600 - sprite.height) / 2;
-
       const ascii = new AsciiFilter();
-      const glitch = new GlitchEmisorFilter();
+      glitch = new GlitchEmisorFilter({
+        offset: 100,
+        slices: 100
+      });
       glitch.intensity = 0;
       ascii.size = 5;
 
@@ -52,46 +69,53 @@ const PixiBackground = () => {
       setTimeout(() => (ascii.size = 2), 6000);
       setTimeout(() => (ascii.size = 1), 8000);
       //ascii.backgroundColor = [0.062, 0.062, 0.105, 1.0];
-      const crtFilter = new CRTFilter({
+      crtFilter = new CRTFilter({
         noise: 0,
         curvature: 0,
         lineWidth: 0,
         lineContrast: 0,
         seed: 0,
-        time: 0,
-        ...crtConfig[randomVideo - 1]
+        time: 0
       });
 
       ascii.charIndexes = [
         0, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
       ];
+      sprite = new Sprite();
       app.stage.addChild(sprite);
 
       sprite.filters = [crtFilter, ascii];
       app.stage.filters = [glitch];
-      console.log('stage dimensions', app.stage.width, app.stage.height);
       setTimeout(() => glitch.startGlitch(), 100);
-      console.log(
-        'canvas dimensions',
-        canvasEl.current!.clientWidth,
-        canvasEl.current!.clientHeight
-      );
-      document.onmousemove = (event: MouseEvent) => {
-        const percentage =
-          (Math.abs(event.movementX) + Math.abs(event.movementY)) /
-          (window.innerWidth + window.innerHeight);
-        glitch.intensity = percentage * 4;
-      };
-      console.log('texture dimensions', texture.width, texture.height);
-      console.log(
-        'back sprite dimensions',
-        backSprite.width,
-        backSprite.height
-      );
-      console.log('sprite dimensions', sprite.width, sprite.height);
+      loadRandomVideo(sprite, crtFilter);
     }
 
-    app.loader.add([assets[randomVideo - 1]]).load(main);
+    document.onmousemove = (event: MouseEvent) => {
+      const x = Math.abs(event.movementX);
+      const y = Math.abs(event.movementY);
+      const increment = Math.max(x + y, 0) / 3000;
+      glitch.intensity = Math.min(
+        glitch.intensity + increment * (0.8 - increment * increment),
+        0.3
+      );
+    };
+    app.loader.load(main);
+    app.ticker.maxFPS = 30;
+    app.ticker.add((delta) => {
+      if (loading) {
+        glitch.intensity = 0.3;
+        return;
+      }
+      if (glitch.intensity === 0.3) glitchCounter++;
+      else glitchCounter = Math.max(glitchCounter - 1, 0);
+      if (glitchCounter >= 30) {
+        glitchCounter = 0;
+        loading = true;
+        console.log('start async load', glitchCounter, delta);
+        loadRandomVideo(sprite, crtFilter);
+      }
+      glitch.intensity = Math.max(glitch.intensity - 0.005, 0);
+    });
   });
 
   return <canvas className='pixi-background' ref={canvasEl} />;
