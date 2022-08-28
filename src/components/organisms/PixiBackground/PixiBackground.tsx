@@ -1,7 +1,7 @@
 import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Texture } from 'pixi.js';
-import { assets, crtConfig } from '../../../assets';
+import { assets } from '../../../assets';
 import AsciiFilter from 'pixi-ascii';
 import { CRTFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../atoms/GlitchEmitterFilter/GlitchEmisorFilter';
@@ -32,13 +32,18 @@ const PixiBackground = () => {
       media.autoplay = true;
       media.loop = true;
       media.onloadeddata = function () {
-        crtFilter.vignetting = crtConfig[randomIndex].vignetting;
-        crtFilter.vignettingAlpha = crtConfig[randomIndex].vignettingAlpha;
-        crtFilter.vignettingBlur = crtConfig[randomIndex].vignettingBlur;
+        crtFilter.vignetting = assets[randomIndex].crtConfig.vignetting;
+        crtFilter.vignettingAlpha =
+          assets[randomIndex].crtConfig.vignettingAlpha;
+        crtFilter.vignettingBlur = assets[randomIndex].crtConfig.vignettingBlur;
         const texture = Texture.from(media);
         sprite.texture = texture;
         sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.75;
         sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.75;
+        if (Math.floor(sprite.height) % 2 === 1) {
+          sprite.height = Math.ceil(sprite.height) + 2;
+        }
+        console.log(sprite.height);
         sprite.x = (1200 - sprite.width) / 2;
         sprite.y = (700 - sprite.height) / 2;
         setTimeout(() => (loading = false), 1000);
