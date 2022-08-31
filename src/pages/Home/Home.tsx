@@ -8,7 +8,7 @@ const Home = () => {
       <div className='container'>
         <Glitcher
           classProps='container-title'
-          text='Welcome, to my little place on the web'
+          text='"The journey is the reward"'
           intensity={0.15}
           colorIntensity={0.4}
         />
@@ -17,10 +17,8 @@ const Home = () => {
             {`Hello there, I'm Leonardo and I'm a software developer from Bolivia.
             Currently pursuing new challenges and opportunites. My main areas of interest are machine learning and web development.`}
           </p>
-          <p>
-            {`I hope you like this website, I spend a good amount of time trying to make
-            it look pretty for you :)`}
-          </p>
+          <p>{`Do you like the what you see? 
+          Shake the coursor to travel through the ascii multiverse!`}</p>
         </div>
       </div>
     </MainLayout>
