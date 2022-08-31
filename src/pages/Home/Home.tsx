@@ -14,11 +14,11 @@ const Home = () => {
         />
         <div className='container-description'>
           <p>
-            {`Hello there, I'm Leonardo and I'm a software developer from Bolivia.
-            Currently pursuing new challenges and opportunites. My main areas of interest are machine learning and web development.`}
+            {`Hello there, I'm Leonardo and I'm a software developer from Bolivia,
+            currently pursuing new challenges and opportunites. My main areas of interest are machine learning and web development.`}
           </p>
           <p>{`Do you like the what you see? 
-          Shake the coursor to travel through the ascii multiverse!`}</p>
+          Shake the cursor to travel through the ascii multiverse!`}</p>
         </div>
       </div>
     </MainLayout>

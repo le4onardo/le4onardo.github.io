@@ -23,8 +23,13 @@ const PixiBackground = () => {
     let loading = false;
     let glitchCounter = 0;
     let crtFilter: CRTFilter;
-    async function loadRandomVideo(sprite: Sprite, crtFilter: CRTFilter) {
-      const randomIndex = Math.floor(Math.random() * assets.length);
+    async function loadRandomVideo(
+      sprite: Sprite,
+      crtFilter: CRTFilter,
+      index?: number
+    ) {
+      const randomIndex =
+        index === undefined ? Math.floor(Math.random() * assets.length) : index;
       const media = document.createElement('video') as HTMLVideoElement;
       media.crossOrigin = '';
       media.src = assets[randomIndex].url;
@@ -40,8 +45,10 @@ const PixiBackground = () => {
         sprite.texture = texture;
         sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.75;
         sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.75;
-        if (Math.floor(sprite.height) % 2 === 1) {
-          sprite.height = Math.ceil(sprite.height) + 2;
+        console.log(sprite.height);
+        const intHeight = Math.floor(sprite.height);
+        if (intHeight % 4 !== 0) {
+          sprite.height = intHeight + 4 - (intHeight % 4);
         }
         console.log(sprite.height);
         sprite.x = (1200 - sprite.width) / 2;
@@ -92,7 +99,7 @@ const PixiBackground = () => {
       sprite.filters = [crtFilter, ascii];
       app.stage.filters = [glitch];
       setTimeout(() => glitch.startGlitch(), 100);
-      loadRandomVideo(sprite, crtFilter);
+      loadRandomVideo(sprite, crtFilter, 19);
     }
 
     document.onmousemove = (event: MouseEvent) => {

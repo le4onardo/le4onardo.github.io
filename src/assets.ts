@@ -4,7 +4,7 @@ export const assets  = [
     url: 'https://le4onardo.github.io/backgrounds/Car_floating_ocean.mp4',
     crtConfig: {
       vignetting: 0.49,
-      vignettingBlur: 0.05,
+      vignettingBlur: 0.15,
       vignettingAlpha: 0.6
     }
   },
@@ -18,7 +18,7 @@ export const assets  = [
     }
   },  {
     name: 'video3',
-    url: 'https://le4onardo.github.io/backgrounds/Journey_into_protorealm_of_mythology.webm', //not too pretty
+    url: 'https://le4onardo.github.io/backgrounds/Magic_forest.mp4', //not too pretty
     crtConfig:{
       vignetting: 0.5, 
       vignettingBlur: 0.3,
@@ -36,9 +36,9 @@ export const assets  = [
     name: 'video5',
     url: 'https://le4onardo.github.io/backgrounds/Background_Video_Loop.mp4',
     crtConfig:{
-      vignetting: 0.48,
+      vignetting: 0.49,
       vignettingBlur: 0.15,
-      vignettingAlpha: 0.8
+      vignettingAlpha: 0.85
     }
   },  {
     name: 'video6',
@@ -58,7 +58,7 @@ export const assets  = [
     }
   }, {
     name: 'video8',
-    url: 'https://le4onardo.github.io/backgrounds/Man_walking_highway.mp4', // too short
+    url: 'https://le4onardo.github.io/backgrounds/Man_walking_highway.mp4', // too short/ starts with delay
     crtConfig:{
       vignetting: 0.48,
       vignettingBlur: 0.15,
@@ -76,7 +76,7 @@ export const assets  = [
     name: 'video10',
     url: 'https://le4onardo.github.io/backgrounds/Moonlight_retro_wave.mp4',
     crtConfig:{
-      vignetting: 0.5,
+      vignetting: 0.55,
       vignettingBlur: 0.2,
       vignettingAlpha: 0.6
     }
@@ -90,9 +90,9 @@ export const assets  = [
     }
   },{
     name: 'video12',
-    url: 'https://le4onardo.github.io/backgrounds/Sandstorm.mp4', // not too pretty
+    url: 'https://le4onardo.github.io/backgrounds/Floating_blue_crystal.mp4', // not too pretty
     crtConfig: {
-      vignetting: 0.47,
+      vignetting: 0.49,
       vignettingBlur: 0.15,
       vignettingAlpha: 0.85
     }
@@ -102,7 +102,7 @@ export const assets  = [
     crtConfig: {
       vignetting: 0.5,
       vignettingBlur: 0.15,
-      vignettingAlpha: 0.9
+      vignettingAlpha: 0.95
     }
   }, {
     name: 'video14',
@@ -130,9 +130,9 @@ export const assets  = [
     }
   },{
     name: 'video17',
-    url: 'https://le4onardo.github.io/backgrounds/flying_through_star_fields.mp4', // not too pretty
+    url: 'https://le4onardo.github.io/backgrounds/Spaceman_walking_towards_blackhole.mp4', // not too pretty
     crtConfig: {
-      vignetting: 0.45,
+      vignetting: 0.6,
       vignettingBlur: 0.2,
       vignettingAlpha: 0.9
     }
@@ -147,17 +147,17 @@ export const assets  = [
   },
   {
     name: 'video19',
-    url: 'https://le4onardo.github.io/backgrounds/Moon_in_forest.mp4',
+    url: 'https://le4onardo.github.io/backgrounds/Moon_in_forest.mp4', // starts with delay
     crtConfig: {
       vignetting: 0.48,
       vignettingBlur: 0.15,
       vignettingAlpha: 0.9
     }
   }, {    name: 'video20',
-  url: 'https://le4onardo.github.io/backgrounds/Man_running_towars_hole.mp4',
+  url: 'https://le4onardo.github.io/backgrounds/Spaceman_in_wormhole.mp4', // starts with delay
   crtConfig: {
-    vignetting: 0.48,
+    vignetting: 0.5,
     vignettingBlur: 0.2,
-    vignettingAlpha: 0.9
+    vignettingAlpha: 0.95
   }}
 ];
