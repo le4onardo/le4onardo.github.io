@@ -2,6 +2,7 @@
     color: white;
     font-family: "raster-font";
     font-size: 0.75rem;
+    overflow-x: hidden;
 }
 
 @font-face {
