@@ -1,12 +1,13 @@
 import MainLayout from '../../components/templates/MainLayout/MainLayout';
-import Glitcher from '../../components/atoms/GlitcherHOC';
+import GlitcherHOC from '../../components/atoms/GlitcherHOC';
+import Glitcher from 'text-glitcher';
 import './Home.css';
 
 const Home = () => {
   return (
     <MainLayout classProps='home'>
       <div className='container'>
-        <Glitcher
+        <GlitcherHOC
           classProps='container-title'
           text='"The journey is the reward"'
           intensity={0.15}
@@ -14,11 +15,19 @@ const Home = () => {
         />
         <div className='container-description'>
           <p>
-            {`Hello there, I'm Leonardo and I'm a software developer from Bolivia,
+            {`Hello there, my name is Leonardo and I'm a software developer from Bolivia,
             currently pursuing new challenges and opportunites. My main areas of interest are machine learning and web development.`}
           </p>
-          <p>{`Do you like the what you see? 
-          Shake the cursor to travel through the ascii multiverse!`}</p>
+          <p>
+            {'Do you like what you see? '}
+            <Glitcher
+              classProps='shake-text'
+              text='Shake'
+              intensity={0.4}
+              colorIntensity={0.2}
+            />{' '}
+            the cursor to travel through the ascii multiverse!
+          </p>
         </div>
       </div>
     </MainLayout>

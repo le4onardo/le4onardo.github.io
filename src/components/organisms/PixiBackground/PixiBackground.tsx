@@ -105,9 +105,10 @@ const PixiBackground = () => {
     document.onmousemove = (event: MouseEvent) => {
       const x = event.movementX;
       const y = event.movementY;
-      const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / 3000;
+      const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+      console.log(x, y, increment);
       glitch.intensity = Math.min(
-        glitch.intensity + increment * (0.8 - increment * increment),
+        glitch.intensity + increment / 6000, //* (0.5 - increment),
         0.3
       );
     };
