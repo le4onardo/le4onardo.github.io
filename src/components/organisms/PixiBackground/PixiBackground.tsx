@@ -8,21 +8,26 @@ import GlitchEmisorFilter from '../../atoms/GlitchEmitterFilter/GlitchEmisorFilt
 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
+  const spriteHeight = 700;
+  const spriteWidth = 1400;
 
   useEffect(() => {
     const app = new Application({
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
+      // INFO
       // backgroundColor: 0x10101b,
-      width: 1400,
-      height: 700
+      // INFO: width correction needed for cut chars on some widths
+      width: spriteWidth + 1,
+      height: spriteHeight
     });
     let sprite: Sprite;
     let glitch: GlitchEmisorFilter;
     let loading = false;
     let glitchCounter = 0;
     let crtFilter: CRTFilter;
+
     async function loadRandomVideo(
       sprite: Sprite,
       crtFilter: CRTFilter,
@@ -43,16 +48,21 @@ const PixiBackground = () => {
         crtFilter.vignettingBlur = assets[randomIndex].crtConfig.vignettingBlur;
         const texture = Texture.from(media);
         sprite.texture = texture;
+
+        // INFO: changing constant changes sprite size keeping aspect ratio
         sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.75;
         sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.75;
         console.log(sprite.height);
+
+        // INFO: height correction needed for cut chars on some heights
         const intHeight = Math.floor(sprite.height);
         if (intHeight % 4 !== 0) {
           sprite.height = intHeight + 4 - (intHeight % 4);
         }
         console.log(sprite.height);
-        sprite.x = (1200 - sprite.width) / 2;
-        sprite.y = (700 - sprite.height) / 2;
+        // INFO: centers media in sprite
+        sprite.x = (spriteWidth - sprite.width) / 2;
+        sprite.y = (spriteHeight - sprite.height) / 2;
         setTimeout(() => (loading = false), 1000);
         console.log('video loaded');
       };
