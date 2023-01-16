@@ -10,10 +10,7 @@
 }
 
 .pixi-background {
-    width: 700px;
-    height: 650px;
-    right: -100px;
-    
+    right: -300px;
     position: absolute;
 }
 

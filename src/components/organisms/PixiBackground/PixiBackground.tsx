@@ -15,7 +15,7 @@ const PixiBackground = () => {
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       // backgroundColor: 0x10101b,
-      width: 1200,
+      width: 1400,
       height: 700
     });
     let sprite: Sprite;
