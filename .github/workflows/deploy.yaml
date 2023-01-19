@@ -15,10 +15,14 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    - name: Configure git
+      run: |
+        git config --global --add safe.directory $(realpath .)
+        git config --global user.name 'auto-deploy'
+        git config --global user.email 'leonardo_jlo@hotmail.com'
+
     - name: Install dependencies
       run: |
-        ls -al
-        git config --global --add safe.directory $(realpath .)
         git checkout main
         git pull
         npm install
@@ -32,6 +36,5 @@ jobs:
         git checkout prod
         cp -R ./dist/. .
         rm -r ./dist
-        git add -A
-        git commit -m "Deploy"
+        git commit -am "Deploy"
         git push
