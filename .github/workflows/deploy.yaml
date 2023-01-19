@@ -3,9 +3,7 @@ name: deploy-to-prod
 on:
   push:
     branches:
-      - main
-    types:
-      - closed
+      - 'main'
 
 jobs:
   # not a command, but job_id
