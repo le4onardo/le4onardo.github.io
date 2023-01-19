@@ -8,8 +8,9 @@ on:
       - closed
 
 jobs:
-  name: Deployment to prod branch
-  if_merged:
+  # not a command, but job_id
+  deploy_to_prod_branch:
+    name: Deployment to prod branch
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
