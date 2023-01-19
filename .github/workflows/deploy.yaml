@@ -10,10 +10,13 @@ on:
 jobs:
   if_merged:
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
     steps:
     - name: Install dependencies
       run: |
-        git branch main
+        ls -al
+        git config --global --add safe.directory $(realpath .)
+        git checkout main
         git pull
         npm install
     - name: Build app
