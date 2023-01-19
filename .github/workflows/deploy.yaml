@@ -1,0 +1,34 @@
+name: deploy-to-prod
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install dependencies
+    run: |
+      git branch main
+      git pull
+      npm install
+    - name: Build app
+      run: 
+        npm run build
+    - name: Deploy on prod branch
+      run: |
+        git checkout prod
+        cp -R ./dist/. .
+        rm -r ./dist
+        git add -A
+        git commit -m "Deploy"
+        git push 
+
+        
+
+
