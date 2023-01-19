@@ -1,15 +1,17 @@
 name: deploy-to-prod
 
 on:
-  pull_request:
+  push:
     branches:
-      - 'main'
+      - main
     types:
       - closed
 
 jobs:
-  if_merged:
-    if: github.event.pull_request.merged == true
+  # not a command, but job_id
+  deploy_to_prod_branch:
+    name: Deployment to prod branch
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
@@ -31,7 +33,7 @@ jobs:
       run: 
         npm run build
 
-    - name: Deploy on prod branch
+    - name: Deploy to prod branch
       run: |
         git checkout prod
         cp -R ./dist/. .
