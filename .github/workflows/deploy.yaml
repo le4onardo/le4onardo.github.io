@@ -3,7 +3,8 @@ name: deploy-to-prod
 on:
   pull_request:
     branches:
-      - $default-branch
+      - 'main'
+      - 'test'
     types:
       - closed
 
