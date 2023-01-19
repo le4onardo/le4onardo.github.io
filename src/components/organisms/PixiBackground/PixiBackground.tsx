@@ -16,7 +16,6 @@ const PixiBackground = () => {
       view: canvasEl.current!,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
-      // INFO
       // backgroundColor: 0x10101b,
       // INFO: width correction needed for cut chars on some widths
       width: spriteWidth + 1,
