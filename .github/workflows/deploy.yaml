@@ -1,4 +1,4 @@
-name: Deploy to prod branch
+name: deploy-to-prod
 
 on:
   pull_request:
