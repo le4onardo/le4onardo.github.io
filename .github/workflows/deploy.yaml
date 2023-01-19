@@ -12,6 +12,9 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repo
+    - uses: actions/checkout@v3
+
     - name: Install dependencies
       run: |
         ls -al
@@ -19,9 +22,11 @@ jobs:
         git checkout main
         git pull
         npm install
+
     - name: Build app
       run: 
         npm run build
+        
     - name: Deploy on prod branch
       run: |
         git checkout prod
