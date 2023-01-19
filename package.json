@@ -12,6 +12,9 @@
     "react-router-dom": "^6.3.0",
     "text-glitcher": "^1.0.0"
   },
+  "engine": {
+    "node": "16.19.0"
+  },
   "scripts": {
     "start": "webpack serve --mode development --open",
     "build": "webpack bundle --mode production"
