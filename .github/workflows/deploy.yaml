@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Install dependencies
-    run: |
+      run: |
       git branch main
       git pull
       npm install
