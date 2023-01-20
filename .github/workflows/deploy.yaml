@@ -30,6 +30,7 @@ jobs:
     - name: Build app and stash
       run: 
         npm run build
+      # stage packaged app
         git add -f ./dist/.
         git stash
 
@@ -37,7 +38,12 @@ jobs:
       run: |
         git checkout prod
         git stash pop
+    # cleans stage from stash    
+        git restore --staged ./dist/
+    # copy from dist to home
         cp -R ./dist/. .
+    # removes dist    
         rm -r ./dist
+    # adds and commits all changes
         git commit -am "Deploy"
         git push
