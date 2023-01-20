@@ -31,7 +31,7 @@ jobs:
       run: 
         npm run build
         git add -f ./dist/.
-        git stash push --staged
+        git stash
 
     - name: Unstash and deploy to prod branch
       run: |
