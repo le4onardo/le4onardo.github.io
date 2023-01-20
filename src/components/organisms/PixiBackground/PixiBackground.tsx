@@ -64,11 +64,11 @@ const PixiBackground = () => {
         sprite.x = (spriteWidth - sprite.width) / 2;
         sprite.y = (spriteHeight - sprite.height) / 2;
         setTimeout(() => (loading = false), 1000);
-        console.log('video loaded');
+        console.log('video loaded', assets[randomIndex].url);
       };
       media.onerror = function () {
         setTimeout(() => (loading = false), 1000);
-        console.log('video load failed');
+        console.log('video load failed', assets[randomIndex].url);
       };
       console.log('load requested');
       media.load();
