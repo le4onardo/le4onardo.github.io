@@ -6,6 +6,7 @@ import AsciiFilter from 'pixi-ascii';
 import { CRTFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../atoms/GlitchEmitterFilter/GlitchEmisorFilter';
 
+// TODO: check pixi react library 
 const PixiBackground = () => {
   const canvasEl = useRef<HTMLCanvasElement>(null);
   const spriteHeight = 700;
