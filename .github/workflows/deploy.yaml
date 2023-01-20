@@ -27,14 +27,23 @@ jobs:
         git pull
         npm install
 
-    - name: Build app
+    - name: Build app and stash
       run: 
         npm run build
+      # stage packaged app
+        git add -f ./dist/.
+        git stash
 
-    - name: Deploy to prod branch
+    - name: Unstash and deploy to prod branch
       run: |
         git checkout prod
+        git stash pop
+    # cleans stage from stash    
+        git restore --staged ./dist/
+    # copy from dist to home
         cp -R ./dist/. .
+    # removes dist    
         rm -r ./dist
+    # adds and commits all changes
         git commit -am "Deploy"
         git push
