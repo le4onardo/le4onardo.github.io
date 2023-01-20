@@ -28,9 +28,9 @@ jobs:
         npm install
 
     - name: Build app and stash
-      run: 
+      run: |
         npm run build
-      # stage packaged app
+    # stage packaged app
         git add -f ./dist/.
         git stash
 
