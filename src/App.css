@@ -5,8 +5,11 @@
     overflow-x: hidden;
 }
 
+#clustrmaps-widget-v2{
+    display: none !important;
+}
+
 @font-face {
     font-family: "raster-font";
-    
     src: url("fonts/Web437_IBM_BIOS.woff") format('woff');
 }
