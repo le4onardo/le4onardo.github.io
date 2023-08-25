@@ -1,0 +1,19 @@
+.presentation-card {
+    cursor: pointer;
+}
+
+.card-title {
+    font-size: 18px;
+    color: pink;
+}
+
+.card-description {
+    font-size: 14px;
+}
+
+.card-info {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 10px;
+    gap: 20px;
+}
