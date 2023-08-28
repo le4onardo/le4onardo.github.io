@@ -1,11 +1,9 @@
 .home .container {
     background-color: transparent;
-    max-width: 1460px;
-    
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;    
-} 
+    justify-content: space-evenly;
+}
 
 .home .container-title {
     max-width: 40%;
@@ -20,6 +18,13 @@
     margin-bottom: 2rem;
 }
 
-.home .shake-text{
+.home .shake-text {
     display: inline;
+}
+
+.home .cards-container {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }

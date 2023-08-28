@@ -1,11 +1,12 @@
-#root{
+#root {
     color: white;
     font-family: "raster-font";
     font-size: 0.75rem;
+    line-height: 1.5;
     overflow-x: hidden;
 }
 
-#clustrmaps-widget-v2{
+#clustrmaps-widget-v2 {
     display: none !important;
 }
 

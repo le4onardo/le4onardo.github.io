@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, } from 'react-router-dom';
 import Home from './pages/Home/Home';
+import Blog from './pages/Blog/Blog';
 import './App.css';
 
 const App = () => {
@@ -7,6 +8,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/:blogTitle' element={<Blog />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,8 @@
 import MainLayout from '../../components/templates/MainLayout/MainLayout';
 import GlitcherHOC from '../../components/atoms/GlitcherHOC';
+import PresentationCard from '../../components/molecules/PresentationCard/PresentationCard';
 import Glitcher from 'text-glitcher';
+import { cardsData } from '../../utils/data';
 import './Home.css';
 
 const Home = () => {
@@ -9,14 +11,13 @@ const Home = () => {
       <div className='container'>
         <GlitcherHOC
           classProps='container-title'
-          text='"The journey is the reward"'
+          text="Just trying to be better..."
           intensity={0.15}
           colorIntensity={0.4}
         />
         <div className='container-description'>
           <p>
-            {`Hello there, my name is Leonardo and I'm a software developer from Bolivia. I enjoy challenges and to spend too much time on the internet. Most of the time you can find me on github or linkedin
-            My main areas of interest are machine learning and web development.`}
+            {`Hi, my name is Leonardo and I'm a software developer from Bolivia. Most of the time you can find me on Github or LinkedIn. Currently sharping my backend skills :)`}
           </p>
           <p>
             {'Do you like what you see? '}
@@ -29,8 +30,23 @@ const Home = () => {
             the cursor to travel through the ascii multiverse!
           </p>
         </div>
+        <div className='cards-container'>
+          {
+            cardsData.map(({ title, description, writeDate, readTime }) =>
+              <PresentationCard
+                key={title}
+                title={title}
+                description={description}
+                writeDate={writeDate}
+                readTime={readTime}
+                redirectTo={title.replaceAll(' ', '_')}
+                onClick={() => { console.log('test') }}
+              />
+            )
+          }
+        </div>
       </div>
-    </MainLayout>
+    </MainLayout >
   );
 };
 
