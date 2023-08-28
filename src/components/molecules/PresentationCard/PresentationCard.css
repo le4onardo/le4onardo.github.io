@@ -1,5 +1,6 @@
-.presentation-card {
-    cursor: pointer;
+.presentation-card a {
+    text-decoration: none;
+    color: white;
 }
 
 .card-title {
