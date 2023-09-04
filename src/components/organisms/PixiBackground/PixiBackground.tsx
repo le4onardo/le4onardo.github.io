@@ -2,7 +2,7 @@ import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Texture, Ticker } from 'pixi.js';
 import AsciiFilter from 'pixi-ascii';
-import { CRTFilter, GlitchFilter } from 'pixi-filters';
+import { CRTFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
 import { AssestType } from '../../../utils/data';
 
