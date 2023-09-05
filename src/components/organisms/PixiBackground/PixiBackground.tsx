@@ -29,7 +29,7 @@ async function fetchVideoInMedia(url: string) {
   return promise;
 }
 
-async function resizeSprite(newWidth: number, newHeight: number, sprite: Sprite) {
+function resizeSprite(newWidth: number, newHeight: number, sprite: Sprite) {
   // INFO: changing constant changes sprite size keeping aspect ratio
   // sprite.scale.x = (canvasEl.current!.clientWidth / texture.width) * 0.75;
   // sprite.scale.y = (canvasEl.current!.clientWidth / texture.width) * 0.75;
@@ -81,7 +81,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
         videoData.crtVignettingAlpha
       crtFilter.current!.vignettingBlur = videoData.crtVignettingBlur;
     } catch (error) {
-      console.log('video load failed', videoData.url);
+      console.log('new video load failed', videoData.url);
     } finally {
       setTimeout(() => (loading.current = false), 1000);
     }

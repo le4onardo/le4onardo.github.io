@@ -46,7 +46,7 @@ export const assets: AssestType[] = [
         url: 'https://le4onardo.github.io/backgrounds/Circular_clouds_and_moon.mp4',
         crtVignetting: 0.47,
         crtVignettingBlur: 0.1,
-        crtVignettingAlpha: 0.61
+        crtVignettingAlpha: 0.65
 
     }, {
         name: 'video3',

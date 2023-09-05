@@ -30,8 +30,7 @@ module.exports = {
         loader: '@mdx-js/loader',
         options: {}
       }]
-    }
-    ]
+    }]
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
@@ -41,9 +40,20 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   devServer: {
-    static: './dist'
+    static: './dist',
+    historyApiFallback: {
+      rewrites: [{ from: /\//, to: '/404.html' }],
+      verbose: true
+    },
   },
-  plugins: [new HtmlWebpackPlugin({
-    template: './index.html'
-  })],
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: '404.html',
+      template: './404.html',
+      chunks: [] // file only for redirection, no JS must be loaded
+    })
+  ],
 };

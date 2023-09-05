@@ -11,9 +11,9 @@ const Home = () => {
       <div className='container'>
         <GlitcherHOC
           classProps='container-title'
-          text="Just trying to be better..."
           intensity={0.15}
           colorIntensity={0.4}
+          text="Welcome my friend..."
         />
         <div className='container-description'>
           <p>
