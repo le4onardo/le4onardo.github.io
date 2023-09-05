@@ -168,11 +168,11 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
   useEffect(() => {
     console.log('new Video', videoData.url);
     loadVideoInCanvas();
-  }, [videoData])
+  }, [videoData]);
 
   useEffect(() => {
     asciiFilter.current!.size = asciiSize;
-  }, [asciiSize])
+  }, [asciiSize]);
 
   return <canvas className='pixi-background' ref={canvasEl} />;
 };
