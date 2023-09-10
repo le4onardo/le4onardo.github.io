@@ -140,7 +140,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
       const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 
       glitchFilter.current!.intensity = Math.min(
-        glitchFilter.current!.intensity + increment / 9000, //* (0.5 - increment),
+        glitchFilter.current!.intensity + increment / 12000, //* (0.5 - increment),
         MAX_GLITCH_INDEX
       );
     };
