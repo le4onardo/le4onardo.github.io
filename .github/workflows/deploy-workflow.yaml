@@ -45,5 +45,5 @@ jobs:
           # removes dist    
           rm -r ./dist
           # adds and commits all changes
-          git commit -am "Deploy"
+          git add -A && git commit -m "Deploy"
           git push
