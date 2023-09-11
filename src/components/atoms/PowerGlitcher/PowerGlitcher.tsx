@@ -1,42 +1,58 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import { useGlitch, } from 'react-powerglitch';
-import { PowerGlitchOptions, RecursivePartial } from 'powerglitch'
+import { PowerGlitchOptions, RecursivePartial, PlayModes } from 'powerglitch'
 import './PowerGlitcher.css';
 
 interface Props {
-    options?: RecursivePartial<PowerGlitchOptions>
+    // -- PowerGlitch props
+    playMode?: PlayModes
+    duration?: number | undefined
+    iterations?: number | undefined
+    timeStart?: number | undefined
+    timeEnd?: number | undefined
+    // -- 
+
     classProps?: string;
     children: React.ReactNode;
 }
 
+// TODO: make new glitch props update the glitcher
 const GlitcherHOC: React.FC<Props> = ({
+    playMode,
+    duration,
+    iterations,
+    timeStart,
+    timeEnd,
+
     classProps = '',
-    options,
     children
 }: Props) => {
     const ref = useRef<HTMLElement>();
-    const glitch = useGlitch(options || {
+    const glitch = useGlitch({
         createContainers: true,
-        playMode: "hover",
+        playMode: playMode || "hover",
         hideOverflow: false,
         timing: {
-            duration: 5000,
-            iterations: Infinity
+            duration: duration || 150,
+            iterations: iterations || 1,
         },
-        glitchTimeSpan: false, // { "start": 0,"end": 1},
+        glitchTimeSpan: {
+            start: timeStart || 0,
+            end: timeEnd || 1
+        },
         shake: {
             velocity: 20,
-            amplitudeX: 0.05,
+            amplitudeX: 0.10,
             amplitudeY: 0.05
         },
         slice: {
-            count: 9,
+            count: 3,
             velocity: 30,
-            minHeight: 0.05,
-            maxHeight: 0.2,
+            minHeight: 0.1,
+            maxHeight: 0.6,
             hueRotate: true
         },
-        pulse: false
+        pulse: false,
     });
     const refCallback = useCallback((node: HTMLElement | null) => {
         if (!node) {
@@ -53,13 +69,18 @@ const GlitcherHOC: React.FC<Props> = ({
             if (i % 3 === 0) el.style.setProperty('color', 'red', 'important');
             if (i % 3 === 1) el.style.setProperty('color', 'green', 'important');
             if (i % 3 === 2) el.style.setProperty('color', 'blue', 'important');
-
             el.classList.add('glitch-layer')
         }
-        console.log(node.parentElement?.parentElement?.classList);
-        classProps && node.parentElement?.parentElement?.classList.add(classProps)
+    }, [])
 
-    }, [options, classProps])
+    useEffect(() => {
+        const glitchContainer = ref.current!.parentElement!.parentElement
+        glitchContainer && classProps && glitchContainer.classList.add(classProps)
+
+        return () => {
+            glitchContainer && classProps && glitchContainer.classList.remove(classProps);
+        }
+    }, [classProps])
 
     return (
         <div ref={refCallback}>

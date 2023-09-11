@@ -4,17 +4,14 @@
 }
 
 .card-title {
-    font-size: 18px;
+    font-size: 22px;
     color: pink;
 }
 
-.card-description {
-    font-size: 14px;
-}
 
 .card-info {
     display: flex;
     justify-content: flex-end;
-    font-size: 10px;
+    font-size: 14px;
     gap: 20px;
 }
