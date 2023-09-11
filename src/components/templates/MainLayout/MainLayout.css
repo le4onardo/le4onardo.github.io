@@ -1,8 +1,8 @@
 .main-layout {
     max-width: 1200px;
-    margin: auto;
+    margin: auto auto 50px;
     position: relative;
-    padding: 0;
+    padding: 0 50px;
 }
 
 .main-layout-container {
@@ -10,12 +10,14 @@
 }
 
 .pixi-background {
-    right: -300px;
+    right: -150px;
     position: absolute;
 }
 
 
-body, html {
-    margin:0;
-    background-color: black /*#10101b;*/
+body,
+html {
+    margin: 0;
+    background-color: black
+        /*#10101b;*/
 }

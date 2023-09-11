@@ -1,25 +1,30 @@
 .home .container {
     background-color: transparent;
-    max-width: 1460px;
-    
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;    
-} 
+    justify-content: space-evenly;
+}
 
-.home .container-title {
+.home .title-container {
     max-width: 40%;
-    font-size: 3rem;
+    font-size: 4rem;
     margin-bottom: 10rem;
     margin-top: 150px;
+    font-weight: bolder;
 }
 
 .home .container-description {
     max-width: 60%;
-    line-height: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3.5rem;
 }
 
-.home .shake-text{
-    display: inline;
+.home .shake-text {
+    display: inline-block;
+}
+
+.home .cards-container {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }

@@ -5,19 +5,23 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 40px;
 }
 
-.navigation-bar a{
-    color: white;
+.navigation-bar>div {
+    flex: 0 0 30px;
+}
+
+.navigation-bar>div:first-child {
+    margin-right: auto;
+}
+
+.navigation-bar a {
+    color: #FFFFFF;
     text-decoration: none;
-    flex-grow: 1;
 }
 
-.navigation-bar .home {
-    flex-grow: 6;
-}
-
-.navigation-bar__link{
+.navigation-bar__link {
     display: flex;
     align-items: center;
 }
@@ -27,4 +31,3 @@
     height: 30px;
     margin-right: 10px;
 }
-

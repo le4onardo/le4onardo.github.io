@@ -1,6 +1,10 @@
+import { useEffect, useState, useCallback, useRef } from 'react';
 import PixiBackground from '../../organisms/PixiBackground/PixiBackground';
 import NavigationBar from '../../organisms/NavigationBar/NavigationBar';
 import './MainLayout.css';
+import { AssestType, assets } from '../../../utils/data';
+import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
+import { CRTFilter } from 'pixi-filters';
 
 interface Props {
   children: React.ReactNode;
@@ -8,10 +12,23 @@ interface Props {
 }
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
+  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(assets[Math.floor(Math.random() * assets.length)]);
+  const glitchCounter = useRef(0);
+
+  const cachedTickFn = useCallback((glitchFilter: GlitchEmisorFilter, _deltacrtFilter: CRTFilter) => {
+    if (glitchFilter.intensity === 0.3) glitchCounter.current++;
+    else glitchCounter.current = Math.max(glitchCounter.current - 1, 0);
+
+    if (glitchCounter.current >= 20) {
+      glitchCounter.current = 0;
+      setBackgroundVideo(assets[Math.floor(Math.random() * assets.length)])
+    }
+  }, [backgroundVideo]);
+
   return (
     <div className={`main-layout ${classProps}`}>
       <div className={`pixi-container`}>
-        <PixiBackground />
+        <PixiBackground height={700} width={1400} videoData={backgroundVideo} ticker={cachedTickFn} asciiSize={1} />
       </div>
       <div className={'main-layout-container'}>
         <NavigationBar />

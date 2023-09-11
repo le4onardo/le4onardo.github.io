@@ -34,57 +34,57 @@ export default class GlitchEmisorFilter extends GlitchFilter {
       : this.uniforms.dimensions[0] / 2;
 
     const rangeY = this.rangeOptions.red
-      ? (this.rangeOptions.red  as number[])[1]
+      ? (this.rangeOptions.red as number[])[1]
       : this.uniforms.dimensions[1] / 4;
 
     return [
       Math.round(
-        (rangeX * Math.random()-rangeX/2) * intensity
+        (rangeX * Math.random() - rangeX / 2) * intensity
       ),
       Math.round(
-        (rangeY * Math.random()-rangeY/2) * intensity
+        (rangeY * Math.random() - rangeY / 2) * intensity
       )
     ];
   }
 
   private getRandomGreen(intensity = 1) {
     const rangeX = this.rangeOptions.green
-      ? (this.rangeOptions.green as number[])[0] 
+      ? (this.rangeOptions.green as number[])[0]
       : this.uniforms.dimensions[0] / 2;
 
     const rangeY = this.rangeOptions.green
       ? (this.rangeOptions.green as number[])[1]
       : this.uniforms.dimensions[1] / 4;
 
-      return [
-        Math.round(
-          (rangeX * Math.random()-rangeX/2) * intensity
-        ),
-        Math.round(
-          (rangeY * Math.random()-rangeY/2) * intensity
-        )
-      ];
+    return [
+      Math.round(
+        (rangeX * Math.random() - rangeX / 2) * intensity
+      ),
+      Math.round(
+        (rangeY * Math.random() - rangeY / 2) * intensity
+      )
+    ];
   }
 
   private getRandomBlue(intensity = 1) {
     const rangeX = this.rangeOptions.blue
-      ? (this.rangeOptions.blue  as number[])[0]
+      ? (this.rangeOptions.blue as number[])[0]
       : this.uniforms.dimensions[0] / 2;
 
     const rangeY = this.rangeOptions.blue
       ? (this.rangeOptions.blue as number[])[1]
       : this.uniforms.dimensions[1] / 4;
-      return [
-        Math.round(
-          (rangeX * Math.random()-rangeX/2) * intensity
-        ),
-        Math.round(
-          (rangeY * Math.random()-rangeY/2) * intensity
-        )
-      ];
+    return [
+      Math.round(
+        (rangeX * Math.random() - rangeX / 2) * intensity
+      ),
+      Math.round(
+        (rangeY * Math.random() - rangeY / 2) * intensity
+      )
+    ];
   }
 
-  public applyRandomGlitch = () => {    
+  public applyRandomGlitch = () => {
     this.refresh();
     this.shuffle();
     this.offset = this.getRandomOffset(this.intensity);
@@ -93,8 +93,10 @@ export default class GlitchEmisorFilter extends GlitchFilter {
     this.green = this.getRandomGreen(this.intensity);
   };
 
-  public startGlitch(duration= 0) {
-    this.repeater.start( this.applyRandomGlitch, duration);
+  public startGlitch(duration = 0) {
+
+    window.setInterval(this.applyRandomGlitch, 30);
+    this.repeater.start(this.applyRandomGlitch, duration);
   }
 
   public stopGlitch() {
