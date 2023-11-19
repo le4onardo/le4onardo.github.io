@@ -28,3 +28,18 @@
     flex-direction: column;
     gap: 40px;
 }
+
+
+@media screen and (max-width: 1024px) {
+    .home .title-container {
+        max-width: 80%;
+        margin: auto;
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 3rem;
+    }
+
+    .home .container-description {
+        margin-top: 50%;
+    }
+}
