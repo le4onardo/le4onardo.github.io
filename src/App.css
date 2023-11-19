@@ -23,6 +23,7 @@
 body,
 html {
     margin: 0;
-    background-color: black
-        /*#10101b;*/
+    background-color: black;
+    /*#10101b;*/
+    --background-width: 1400px;
 }

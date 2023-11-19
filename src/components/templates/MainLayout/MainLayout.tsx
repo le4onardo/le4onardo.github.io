@@ -12,10 +12,17 @@ interface Props {
 }
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
-  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(assets[Math.floor(Math.random() * assets.length)]);
   const glitchCounter = useRef(0);
+  
 
-  const cachedTickFn = useCallback((glitchFilter: GlitchEmisorFilter, _deltacrtFilter: CRTFilter) => {
+  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(
+    // initial random video 
+    assets[Math.floor(Math.random() * assets.length)]
+  );
+
+  const cachedTickFn = useCallback((
+    glitchFilter: GlitchEmisorFilter,
+    _deltacrtFilter: CRTFilter) => {
     if (glitchFilter.intensity === 0.3) glitchCounter.current++;
     else glitchCounter.current = Math.max(glitchCounter.current - 1, 0);
 

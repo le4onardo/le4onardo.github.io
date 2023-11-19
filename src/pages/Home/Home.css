@@ -6,7 +6,7 @@
 }
 
 .home .title-container {
-    max-width: 40%;
+    max-width: 30rem;
     font-size: 4rem;
     margin-bottom: 10rem;
     margin-top: 150px;
@@ -14,7 +14,7 @@
 }
 
 .home .container-description {
-    max-width: 60%;
+    max-width: 40rem;
     margin-bottom: 3.5rem;
 }
 
@@ -32,7 +32,7 @@
 
 @media screen and (max-width: 1024px) {
     .home .title-container {
-        max-width: 80%;
+        max-width: none;
         margin: auto;
         text-align: center;
         margin-top: 2rem;
@@ -40,6 +40,6 @@
     }
 
     .home .container-description {
-        margin-top: 50%;
+        margin-top: 24rem;
     }
 }
