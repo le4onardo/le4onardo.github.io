@@ -63,7 +63,7 @@ const GlitcherHOC: React.FC<Props> = ({
         // Must be placed after glitch.ref because it changes parent and adds children
         const glitchElements = node.parentElement!.children
 
-        // Actual React element displayed on screen
+        // Omitting 0 because is the actual react element displayed on screen
         for (let i = 1; i < glitchElements.length; i++) {
             const el = glitchElements[i] as HTMLElement;
             if (i % 3 === 0) el.style.setProperty('color', 'red', 'important');
