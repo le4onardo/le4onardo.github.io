@@ -35,11 +35,12 @@
         max-width: none;
         margin: auto;
         text-align: center;
-        margin-top: 2rem;
+        margin-top: 6rem;
         font-size: 3rem;
     }
 
     .home .container-description {
         margin-top: 24rem;
+        max-width: none;
     }
 }

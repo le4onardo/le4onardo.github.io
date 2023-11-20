@@ -24,6 +24,6 @@
     .pixi-container {
         /* Keeps banner at the center on mobile screens*/
         right: calc((var(--background-width) - 100vw)/(-2));
-        top: 50px;
+        top: 6rem;
     }
 }
