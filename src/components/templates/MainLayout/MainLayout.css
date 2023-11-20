@@ -9,15 +9,21 @@
     position: relative;
 }
 
-.pixi-background {
+.pixi-container {
+    width: var(--background-width);
+    height: 700px;
     right: -150px;
     position: absolute;
 }
 
+@media screen and (max-width: 1024px) {
+    .main-layout {
+        padding: 0 20px;
+    }
 
-body,
-html {
-    margin: 0;
-    background-color: black
-        /*#10101b;*/
+    .pixi-container {
+        /* Keeps banner at the center on mobile screens*/
+        right: calc((var(--background-width) - 100vw)/(-2));
+        top: 6rem;
+    }
 }

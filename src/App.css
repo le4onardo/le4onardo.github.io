@@ -9,13 +9,6 @@
     display: none !important;
 }
 
-/*
-// TODO: delete code and font
-@font-face {
-    font-family: "raster-font";
-    src: url("fonts/Web437_IBM_BIOS.woff") format('woff');
-}
-*/
 
 @font-face {
     font-family: "Motomangucode";
@@ -25,4 +18,12 @@
         url("fonts/MotomangucodeBold-4B0J4.woff2") format('woff2'),
         url("fonts/MotomangucodeBoldItalic-ow8Wx.woff2") format('woff2'),
         url("fonts/MotomangucodeItalic-0WXJd.woff2") format('woff2');
+}
+
+body,
+html {
+    margin: 0;
+    background-color: black;
+    /*#10101b;*/
+    --background-width: 1400px;
 }

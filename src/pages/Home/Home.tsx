@@ -13,7 +13,7 @@ const Home = () => {
         </span>
         <div className='container-description'>
           <p>
-            {`Hi, my name is Leonardo and I'm a software developer from Bolivia. Most of the time you can find me on Github or LinkedIn. Currently sharping my backend skills`}
+            {`Hi, I am Leonardo and I'm a software developer from Bolivia. Most of the time you can find me on Github or LinkedIn. Currently sharping my backend skills`}
           </p>
           <div>
             {`Do you like what you see? `}
