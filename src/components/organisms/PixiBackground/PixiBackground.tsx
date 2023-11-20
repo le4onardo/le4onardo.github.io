@@ -51,7 +51,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
     try {
       const sprite = spriteRef.current!;
       const { crt } = filtersRef.current!;
-      const { width, height } = canvasRef.current!;
+      // const { width, height } = canvasRef.current!;
       loading.current = true;
       const media = await fetchVideoInMedia(videoData.url) as HTMLVideoElement;
       const texture = Texture.from(media);
@@ -77,7 +77,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
       autoDensity: true,
       // backgroundColor: 0x10101b,
       width: width,
-      height: height,
+      height: height
       // resizeTo: canvas.parentElement as HTMLElement
     });
     pixiRef.current = pixiApp;
