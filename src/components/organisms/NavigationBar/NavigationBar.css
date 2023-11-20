@@ -31,3 +31,10 @@
     height: 30px;
     margin-right: 10px;
 }
+
+@media screen and (max-width: 1024px) {
+    .navigation-bar {
+        margin-top: 0;
+        gap: 10px;
+    }
+}
