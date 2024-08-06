@@ -1,10 +1,15 @@
 import MainLayout from '../../components/templates/MainLayout/MainLayout';
-import PowerGlitcher from '../../components/atoms/PowerGlitcher/PowerGlitcher';
 import PresentationCard from '../../components/molecules/PresentationCard/PresentationCard';
 import { cardsData } from '../../utils/data';
 import './Home.css';
+import useGlitcher from '../../hooks/useGlitcher';
 
 const Home = () => {
+  const { ref } = useGlitcher({
+    playMode: 'always',
+    timing: { duration: 4000, iterations: Infinity },
+    glitchTimeSpan: { start: 0.5, end: 0.8 }
+  })
   return (
     <MainLayout classProps='home'>
       <div className='container'>
@@ -17,9 +22,11 @@ const Home = () => {
           </p>
           <div>
             {`Do you like what you see? `}
-            <PowerGlitcher classProps='shake-text' playMode='always' duration={4000} iterations={Infinity} timeStart={0.5} timeEnd={0.75}>
-              {'Shake'}
-            </PowerGlitcher>
+            <div className='shake-text'>
+              <div ref={ref}>
+                <span>Shake</span>
+              </div>
+            </div>
             {` the cursor to travel through the ascii multiverse!`}
           </div>
         </div>
