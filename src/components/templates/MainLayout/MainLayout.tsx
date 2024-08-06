@@ -11,24 +11,28 @@ interface Props {
   classProps: string;
 }
 
-const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
-  const glitchCounter = useRef(0);
-  
+const getRandomVideo = () => assets[Math.floor(Math.random() * assets.length)];
 
-  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(
-    // initial random video 
-    assets[Math.floor(Math.random() * assets.length)]
-  );
+const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
+  const loadThreshold = useRef(0);
+
+
+  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(getRandomVideo());
 
   const cachedTickFn = useCallback((
     glitchFilter: GlitchEmisorFilter,
     _deltacrtFilter: CRTFilter) => {
-    if (glitchFilter.intensity === 0.3) glitchCounter.current++;
-    else glitchCounter.current = Math.max(glitchCounter.current - 1, 0);
+    if (glitchFilter.intensity === 0.3) {
+      loadThreshold.current++;
+    } else {
+      // reduce count over time
+      loadThreshold.current = Math.max(loadThreshold.current - 1, 0);
+    }
 
-    if (glitchCounter.current >= 20) {
-      glitchCounter.current = 0;
-      setBackgroundVideo(assets[Math.floor(Math.random() * assets.length)])
+    // user glitched a lot during some time
+    if (loadThreshold.current >= 20) {
+      loadThreshold.current = 0;
+      setBackgroundVideo(getRandomVideo())
     }
   }, [backgroundVideo]);
 

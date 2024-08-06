@@ -120,21 +120,6 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
       setTimeout(() => glitch.startGlitch(), 100);
     }
 
-
-    const onMouseMove = (event: MouseEvent) => {
-      const { glitch } = filtersRef.current!;
-      const x = event.movementX;
-      const y = event.movementY;
-      const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-
-      glitch.intensity = Math.min(
-        glitch.intensity + increment / 12000, //* (0.5 - increment),
-        MAX_GLITCH_INDEX
-      );
-    };
-    document.onmousemove = onMouseMove;
-
-
     pixiApp.loader.load(onPixiInit);
     pixiApp.ticker.maxFPS = 30;
     pixiApp.ticker.add(async (_delta) => {
@@ -160,9 +145,26 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
 
 
     return () => {
-      document.removeEventListener('mousemove', onMouseMove);
       pixiApp.destroy(false, true);
     }
+  }, []);
+
+  useEffect(() => {
+    const onMouseMove = (event: MouseEvent) => {
+      if (!filtersRef.current) return;
+
+      const { glitch } = filtersRef.current;
+      const x = event.movementX;
+      const y = event.movementY;
+      const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+
+      glitch.intensity = Math.min(
+        glitch.intensity + increment / 12000, //* (0.5 - increment),
+        MAX_GLITCH_INDEX
+      );
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    return () => document.removeEventListener('mousemove', onMouseMove);
   }, []);
 
 
