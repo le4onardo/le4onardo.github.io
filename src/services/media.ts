@@ -1,5 +1,5 @@
 
-export const fetchVideoInMedia = async (url: string) => {
+export const fetchVideoInMedia = async (url: string): Promise<HTMLVideoElement> => {
     const media = document.createElement('video') as HTMLVideoElement;
     media.crossOrigin = '';
     media.src = url;
@@ -7,8 +7,9 @@ export const fetchVideoInMedia = async (url: string) => {
     media.autoplay = true;
     media.loop = true;
 
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<HTMLVideoElement>((resolve, reject) => {
         media.onloadeddata = function () {
+            console.log('LOADED DATA! ' + url, media.readyState)
             resolve(media);
         };
         media.onerror = function () {
@@ -17,6 +18,6 @@ export const fetchVideoInMedia = async (url: string) => {
     });
 
     media.load();
-    console.log('load requested');
+
     return promise;
 }

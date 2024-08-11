@@ -15,11 +15,10 @@ const getRandomVideo = () => assets[Math.floor(Math.random() * assets.length)];
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
   const loadThreshold = useRef(0);
-
-
   const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(getRandomVideo());
+  const [nextVideo, setNextVideo] = useState<AssestType>(getRandomVideo());
 
-  const cachedTickFn = useCallback((
+  const cachedTickFn = (
     glitchFilter: GlitchEmisorFilter,
     _deltacrtFilter: CRTFilter) => {
     if (glitchFilter.intensity === 0.3) {
@@ -32,14 +31,19 @@ const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
     // user glitched a lot during some time
     if (loadThreshold.current >= 20) {
       loadThreshold.current = 0;
-      setBackgroundVideo(getRandomVideo())
+      console.log('user glitched a lot', nextVideo);
+      setBackgroundVideo(nextVideo)
+      setNextVideo(getRandomVideo())
     }
-  }, [backgroundVideo]);
+    glitchFilter.intensity = Math.max(glitchFilter.intensity - 0.005, 0);
+  };
+
+  console.log('rendering main layout', backgroundVideo, nextVideo);
 
   return (
     <div className={`main-layout ${classProps}`}>
       <div className={`pixi-container`}>
-        <PixiBackground height={700} width={1400} videoData={backgroundVideo} ticker={cachedTickFn} asciiSize={1} />
+        <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} ticker={cachedTickFn} asciiSize={1} />
       </div>
       <div className={'main-layout-container'}>
         <NavigationBar />

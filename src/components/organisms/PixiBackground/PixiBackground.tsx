@@ -28,6 +28,7 @@ interface Props {
   height: number;
   width: number;
   videoData: AssestType;
+  nextVideoData?: AssestType;
   asciiSize?: number;
   ticker?: (glitchFilter: GlitchEmisorFilter, crtFilter: CRTFilter, asciiFilter: AsciiFilter) => void,
 }
@@ -35,11 +36,13 @@ interface Props {
 const MAX_GLITCH_INDEX = 0.3
 
 // TODO: check pixi react library
-const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asciiSize = 1 }: Props) => {
+const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nextVideoData, asciiSize = 1 }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spriteRef = useRef<Sprite>();
   const pixiRef = useRef<Application>();
   const loading = useRef<boolean>(false);
+  const mediaRequest = useRef<Promise<HTMLVideoElement>>();
+
   const filtersRef = useRef<{
     crt: CRTFilter,
     ascii: AsciiFilter,
@@ -53,7 +56,8 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
       const { crt } = filtersRef.current!;
       // const { width, height } = canvasRef.current!;
       loading.current = true;
-      const media = await fetchVideoInMedia(videoData.url) as HTMLVideoElement;
+
+      const media = (await mediaRequest.current)!;
       const texture = Texture.from(media);
       sprite.texture = texture;
       resizeSprite(width, height, sprite);
@@ -64,6 +68,9 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
     } catch (error) {
       console.log('new video load failed', videoData.url);
     } finally {
+      if (nextVideoData) {
+        mediaRequest.current = fetchVideoInMedia(nextVideoData.url);
+      }
       setTimeout(() => (loading.current = false), 1000);
     }
   }
@@ -122,7 +129,14 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
 
     pixiApp.loader.load(onPixiInit);
     pixiApp.ticker.maxFPS = 30;
-    pixiApp.ticker.add(async (_delta) => {
+    mediaRequest.current = fetchVideoInMedia(videoData.url);
+    return () => {
+      pixiApp.destroy(false, true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const defaultTicker = async (_delta: number) => {
       const { glitch, crt, ascii } = filtersRef.current!;
       if (loading.current) {
         glitch.intensity = MAX_GLITCH_INDEX;
@@ -131,7 +145,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
       ticker && ticker(glitch, crt, ascii);
 
       // Smooth glitch reduction effect over time
-      glitch.intensity = Math.max(glitch.intensity - 0.005, 0);
+      // glitch.intensity = Math.max(glitch.intensity - 0.005, 0);
 
       /* resize (experimental)
       if (pixiApp.screen.width !== canvasEl.current!.parentElement!.clientWidth) {
@@ -141,13 +155,10 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
           sprite.current!
         );
       }*/
-    });
-
-
-    return () => {
-      pixiApp.destroy(false, true);
     }
-  }, []);
+    pixiRef.current?.ticker?.add(defaultTicker);
+    return () => { pixiRef.current?.ticker?.remove(defaultTicker) };
+  }, [ticker]);
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {
@@ -169,7 +180,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, asc
 
 
   useEffect(() => {
-    console.log('new Video', videoData.url);
+    console.log('new videos', videoData.url);
     loadVideoInCanvas();
   }, [videoData]);
 
