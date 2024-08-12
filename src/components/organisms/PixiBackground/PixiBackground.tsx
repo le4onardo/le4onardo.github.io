@@ -164,7 +164,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       const x = event.movementX;
       const y = event.movementY;
       const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
-        / (window.innerWidth + window.innerHeight) / 5;
+        / (window.innerWidth + window.innerHeight) / 6;
 
       filtersRef.current.glitch.intensity = Math.min(
         filtersRef.current.glitch.intensity + increment,
