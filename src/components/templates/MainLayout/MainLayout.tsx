@@ -19,6 +19,7 @@ const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
   const loadThreshold = useRef(0);
   const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(getRandomVideo());
   const [nextVideo, setNextVideo] = useState<AssestType>(getRandomVideo());
+  const [asciiSize, setAsciiSize] = useState(1);
 
   const cachedTickFn = (
     filters: { glitch: GlitchEmisorFilter },
@@ -51,9 +52,13 @@ const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
 
 
   return (
-    <div className={`main-layout ${classProps}`}>
+    <div className={`main-layout ${classProps}`}
+      onMouseDownCapture={() => { setAsciiSize(2); }}
+      onMouseUp={() => { setAsciiSize(1); }}
+      onMouseLeave={() => { setAsciiSize(1); }}
+    >
       <div className={`pixi-container`}>
-        <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} ticker={cachedTickFn} asciiSize={1} />
+        <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} ticker={cachedTickFn} asciiSize={asciiSize} />
       </div>
       <div className={'main-layout-container'}>
         <NavigationBar />
