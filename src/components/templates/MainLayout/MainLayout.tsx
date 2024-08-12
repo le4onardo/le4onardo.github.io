@@ -13,7 +13,7 @@ interface Props {
 const getRandomVideo = () => assets[Math.floor(Math.random() * assets.length)];
 const MAX_GLITCH_INDEX = 0.3
 const GLITCH_DEGRADING_FACTOR = 0.005
-const NEXT_VIDEO_THRESHOLD = 20
+const NEXT_VIDEO_THRESHOLD = 15
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
   const loadThreshold = useRef(0);
