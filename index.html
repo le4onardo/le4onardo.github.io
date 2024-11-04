@@ -17,4 +17,169 @@
                     l.pathname.slice(0, -1) + decoded + l.hash
                 );
             }
-        }(window.location))</script><meta charset="utf-8"><meta name="viewport" content="initial-scale=1"/><title>Le4onardo</title><script defer="defer" src="bundle.js"></script></head><body><div id="root"></div></body></html>
+        }(window.location))</script><meta charset="utf-8"><meta name="viewport" content="initial-scale=1"/><title>Le4onardo</title><link rel="preload" href="/bundle.js" as="script" type="text/javascript"><script defer="defer" src="bundle.js"></script><style type="text/css">
+.navigation-bar {
+    margin-top: 15px;
+    height: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+}
+
+.navigation-bar>div {
+    flex: 0 0 30px;
+}
+
+.navigation-bar>div:first-child {
+    margin-right: auto;
+}
+
+.navigation-bar a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.navigation-bar__link {
+    display: flex;
+    align-items: center;
+}
+
+.navigation-bar__link img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 1024px) {
+    .navigation-bar {
+        margin-top: 0;
+        gap: 10px;
+    }
+}
+.main-layout {
+    max-width: 1200px;
+    margin: auto auto 50px;
+    position: relative;
+    padding: 0 50px;
+}
+
+.main-layout-container {
+    position: relative;
+}
+
+.pixi-container {
+    width: var(--background-width);
+    height: 700px;
+    right: -150px;
+    position: absolute;
+}
+
+@media screen and (max-width: 1024px) {
+    .main-layout {
+        padding: 0 20px;
+        overflow: hidden;
+    }
+
+    .pixi-container {
+        /* Keeps banner at the center on mobile screens*/
+        right: calc((var(--background-width) - 100vw)/(-2));
+        top: 6rem;
+    }
+}
+.presentation-card a {
+    text-decoration: none;
+    color: white;
+}
+
+.card-title {
+    font-size: 22px;
+    color: pink;
+}
+
+
+.card-info {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 14px;
+    gap: 20px;
+}
+.home .container {
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.home .title-container {
+    max-width: 30rem;
+    font-size: 4rem;
+    margin-bottom: 10rem;
+    margin-top: 150px;
+    font-weight: bolder;
+}
+
+.home .container-description {
+    max-width: 40rem;
+    margin-bottom: 3.5rem;
+}
+
+.home .shake-text {
+    display: inline-block;
+}
+
+.home .cards-container {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+
+@media screen and (max-width: 1024px) {
+    .home .title-container {
+        max-width: none;
+        margin: auto;
+        text-align: center;
+        margin-top: 6rem;
+        font-size: 3rem;
+        word-break: break-word;
+    }
+
+    .home .container-description {
+        margin-top: 24rem;
+        max-width: none;
+    }
+}
+#root {
+    color: white;
+    font-family: 'Motomangucode', sans-serif;
+    font-size: 1rem;
+    overflow-x: hidden;
+}
+
+#clustrmaps-widget-v2 {
+    display: none !important;
+}
+
+
+@font-face {
+    font-family: "Motomangucode";
+    src:
+        local('Motomangucode'),
+        url(a23cb3d446b24718177e.woff2) format('woff2'),
+        url(d9121bde55686a74b96b.woff2) format('woff2'),
+        url(906aa71a5c4f1fbbdc74.woff2) format('woff2'),
+        url(db828bee129fc68e7723.woff2) format('woff2');
+    font-display: block;
+}
+
+body,
+html {
+    margin: 0;
+    background-color: black;
+    /*#10101b;*/
+    --background-width: 1400px;
+}
+</style></head><body><div id="root"></div></body></html>
