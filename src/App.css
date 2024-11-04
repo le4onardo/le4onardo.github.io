@@ -18,6 +18,7 @@
         url("fonts/MotomangucodeBold-4B0J4.woff2") format('woff2'),
         url("fonts/MotomangucodeBoldItalic-ow8Wx.woff2") format('woff2'),
         url("fonts/MotomangucodeItalic-0WXJd.woff2") format('woff2');
+    font-display: block;
 }
 
 body,
