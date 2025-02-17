@@ -29,6 +29,7 @@ export const cardsData: {
 export interface AssestType {
     name: string;
     url: string;
+    backgroundUrl?: string;
     crtVignetting: number,
     crtVignettingBlur: number,
     crtVignettingAlpha: number
@@ -38,6 +39,7 @@ export const assets: AssestType[] = [
     {
         name: 'video1',
         url: 'https://le4onardo.github.io/backgrounds/Car_floating_ocean.mp4',
+        backgroundUrl: 'https://iili.io/2pmKSa9.png',
         crtVignetting: 0.49,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.61
@@ -45,6 +47,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video2',
         url: 'https://le4onardo.github.io/backgrounds/Circular_clouds_and_moon.mp4',
+        backgroundUrl: 'https://iili.io/2ppCsTX.png',
         crtVignetting: 0.47,
         crtVignettingBlur: 0.1,
         crtVignettingAlpha: 0.65
@@ -52,6 +55,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video3',
         url: 'https://le4onardo.github.io/backgrounds/Magic_forest.mp4', //not too pretty
+        backgroundUrl: 'https://iili.io/2ppxlIt.png',
         crtVignetting: 0.5,
         crtVignettingBlur: 0.3,
         crtVignettingAlpha: 0.93
@@ -59,6 +63,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video4',
         url: 'https://le4onardo.github.io/backgrounds/Night_Sky_on_Mars.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.46,
         crtVignettingBlur: 0.23,
         crtVignettingAlpha: 1
@@ -66,12 +71,14 @@ export const assets: AssestType[] = [
     }, {
         name: 'video5',
         url: 'https://le4onardo.github.io/backgrounds/Background_Video_Loop.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.49,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.9
     }, {
         name: 'video6',
         url: 'https://le4onardo.github.io/backgrounds/Man_flying_to_sun.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.47,
         crtVignettingBlur: 0.2,
         crtVignettingAlpha: 0.81
@@ -79,13 +86,14 @@ export const assets: AssestType[] = [
     }, {
         name: 'video7',
         url: 'https://le4onardo.github.io/backgrounds/Galaxy.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.5,
         crtVignettingBlur: 0.1,
         crtVignettingAlpha: 0.91
     }, {
         name: 'video8',
         url: 'https://le4onardo.github.io/backgrounds/Man_walking_highway.mp4', // too short/ starts with delay
-
+        backgroundUrl: '',
         crtVignetting: 0.48,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.86
@@ -93,7 +101,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video9',
         url: 'https://le4onardo.github.io/backgrounds/Man_walking_on_water.mp4',
-
+        backgroundUrl: '',
         crtVignetting: 0.46,
         crtVignettingBlur: 0.1,
         crtVignettingAlpha: 0.89
@@ -101,6 +109,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video10',
         url: 'https://le4onardo.github.io/backgrounds/Moonlight_retro_wave.mp4',
+        backgroundUrl: 'https://iili.io/2pbdIp4.png',
 
         crtVignetting: 0.55,
         crtVignettingBlur: 0.2,
@@ -109,15 +118,15 @@ export const assets: AssestType[] = [
     }, {
         name: 'video11',
         url: 'https://le4onardo.github.io/backgrounds/Nebula_Motion.mp4',
-
-        crtVignetting: 0.4,
+        backgroundUrl: '',
+        crtVignetting: 0.7,
         crtVignettingBlur: 0.1,
         crtVignettingAlpha: 0.71
 
     }, {
         name: 'video12',
         url: 'https://le4onardo.github.io/backgrounds/Floating_blue_crystal.mp4', // not too pretty
-
+        backgroundUrl: '',
         crtVignetting: 0.49,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.86
@@ -125,6 +134,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video13',
         url: 'https://le4onardo.github.io/backgrounds/Shattered_monolith.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.5,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.96
@@ -132,6 +142,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video14',
         url: 'https://le4onardo.github.io/backgrounds/Space_Drive.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.48,
         crtVignettingBlur: 0.1,
         crtVignettingAlpha: 0.95
@@ -139,6 +150,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video15',
         url: 'https://le4onardo.github.io/backgrounds/Spaceman_Walking_Home.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.46,
         crtVignettingBlur: 0.2,
         crtVignettingAlpha: 0.94
@@ -146,6 +158,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video16',
         url: 'https://le4onardo.github.io/backgrounds/Stars_Sky_Constellation.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.45,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.51
@@ -153,6 +166,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video17',
         url: 'https://le4onardo.github.io/backgrounds/Spaceman_walking_towards_blackhole.mp4', // not too pretty
+        backgroundUrl: '',
         crtVignetting: 0.6,
         crtVignettingBlur: 0.2,
         crtVignettingAlpha: 0.91
@@ -160,6 +174,7 @@ export const assets: AssestType[] = [
     }, {
         name: 'video18',
         url: 'https://le4onardo.github.io/backgrounds/spaceman_floating_purple_water.mp4',
+        backgroundUrl: '',
         crtVignetting: 0.5,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.9
@@ -168,6 +183,7 @@ export const assets: AssestType[] = [
     {
         name: 'video19',
         url: 'https://le4onardo.github.io/backgrounds/Moon_in_forest.mp4', // starts with delay
+        backgroundUrl: '',
         crtVignetting: 0.48,
         crtVignettingBlur: 0.15,
         crtVignettingAlpha: 0.91
@@ -175,8 +191,18 @@ export const assets: AssestType[] = [
     }, {
         name: 'video20',
         url: 'https://le4onardo.github.io/backgrounds/Spaceman_in_wormhole.mp4', // starts with delay
+        backgroundUrl: '',
         crtVignetting: 0.5,
         crtVignettingBlur: 0.2,
         crtVignettingAlpha: 0.96
-    }
+    },
+    {
+        name: 'video21',
+        url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/Cyberpunk+2077+Night+City+4K+animated+wallpaper+1080.mp4',
+        backgroundUrl: 'https://jvbkwrawu6yoxqkg.public.blob.vercel-storage.com/cyberpunk_2077_night_sky/Cyberpunk%202077%20Night%20City%204K%20animated%20wallpaper%201080-iHAykAecSlPrB2dVgaX4uCYnnKnTr6.webp',
+        crtVignetting: 0.5,
+        crtVignettingBlur: 0.3,
+        crtVignettingAlpha: 0.98
+    },
+
 ];
