@@ -199,9 +199,11 @@ export const assets: AssestType[] = [
     {
         name: 'video21',
         url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/Cyberpunk+2077+Night+City+4K+animated+wallpaper+1080.mp4',
-        backgroundUrl: 'https://jvbkwrawu6yoxqkg.public.blob.vercel-storage.com/cyberpunk_2077_night_sky/Cyberpunk%202077%20Night%20City%204K%20animated%20wallpaper%201080-iHAykAecSlPrB2dVgaX4uCYnnKnTr6.webp',
+        backgroundUrl: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/Cyberpunk+2077+Night+City+4K+animated+wallpaper+1080.webp',
         crtVignetting: 0.5,
-        crtVignettingBlur: 0.3,
+        crtVignettingBlur: 0.25,
+
+        // 0.3,
         crtVignettingAlpha: 0.98
     },
 

@@ -1,7 +1,6 @@
 import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Texture, Ticker } from 'pixi.js';
-import AsciiFilter from 'pixi-ascii';
 import { CRTFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
 import { AssestType } from '../../../utils/data';
@@ -34,7 +33,6 @@ interface Props {
     filters: {
       glitch: GlitchEmisorFilter,
       crt: CRTFilter,
-      ascii: AsciiFilter
     }, loading: boolean
   ) => void,
 }
@@ -42,15 +40,14 @@ interface Props {
 
 
 // TODO: check pixi react library
-const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nextVideoData, asciiSize = 1 }: Props) => {
+const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nextVideoData }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spriteRef = useRef<Sprite>();
   const pixiRef = useRef<Application>();
   const loading = useRef<boolean>(false);
-  const mediaRequest = useRef<Promise<HTMLVideoElement>>();
+  const mediaRequest = useRef<Promise<HTMLVideoElement | HTMLImageElement>>();
   const filtersRef = useRef<{
     crt: CRTFilter,
-    ascii: AsciiFilter,
     glitch: GlitchEmisorFilter
   }>();
 
@@ -70,8 +67,10 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       crt.vignetting = videoData.crtVignetting;
       crt.vignettingAlpha = videoData.crtVignettingAlpha
       crt.vignettingBlur = videoData.crtVignettingBlur;
+
+      canvasRef.current!.style.opacity = "1";
     } catch (error) {
-      console.log('new video load failed', videoData.url);
+      console.log('video load failed', videoData.url, error);
     } finally {
       if (nextVideoData) {
         mediaRequest.current = fetchVideoInMedia(nextVideoData.url);
@@ -87,6 +86,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       view: canvas,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
+      // backgroundAlpha: 0,
       // backgroundColor: 0x10101b,
       width: width,
       height: height
@@ -99,11 +99,10 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       const backSprite = new Sprite();
       const sprite = new Sprite();
       const crt = new CRTFilter();
-      const ascii = new AsciiFilter();
-      const glitch = new GlitchEmisorFilter();
+      const glitch = new GlitchEmisorFilter({ slices: 500, offset: 0 });
 
       spriteRef.current = sprite;
-      filtersRef.current = { crt, glitch, ascii };
+      filtersRef.current = { crt, glitch };
 
       backSprite.width = canvas.width;
       backSprite.height = canvas.height;
@@ -115,21 +114,17 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       crt.seed = 0;
       crt.time = 0;
 
-      glitch.intensity = 0;
-      glitch.offset = 100;
-      glitch.slices = 100;
-
-      ascii.charIndexes = [
-        0, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
-      ];
-      //ascii.backgroundColor = [0.062, 0.062, 0.105, 1.0];
-
       pixiApp.stage.addChild(backSprite);
       pixiApp.stage.addChild(sprite);
-      sprite.filters = [crt, ascii];
+      sprite.filters = [crt];
       pixiApp.stage.filters = [glitch];
 
       setTimeout(() => glitch.startGlitch(), 100);
+
+      /*
+      sprite.texture = Texture.from(videoData.backgroundUrl);
+      setTimeout(() => resizeSprite(width, height, sprite), 100);
+      */
     }
 
     pixiApp.loader.load(onPixiInit);
@@ -155,19 +150,23 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       }*/
     }
     pixiRef.current?.ticker?.add(defaultTicker);
+
     return () => { pixiRef.current?.ticker?.remove(defaultTicker) };
   }, [ticker]);
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {
-      if (!filtersRef.current) return;
+      const { glitch } = filtersRef.current || {};
+
+      if (!glitch || loading.current) return;
+
       const x = event.movementX;
       const y = event.movementY;
       const increment = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
         / (window.innerWidth + window.innerHeight) / 6;
 
-      filtersRef.current.glitch.intensity = Math.min(
-        filtersRef.current.glitch.intensity + increment,
+      glitch.intensity = Math.min(
+        glitch.intensity + increment,
         0.3
       );
     };
@@ -180,11 +179,6 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
     loadVideoInCanvas();
   }, [videoData]);
 
-
-  useEffect(() => {
-    const { ascii } = filtersRef.current!;
-    ascii.size = asciiSize;
-  }, [asciiSize]);
 
   return <canvas className='pixi-background' ref={canvasRef} />;
 };
