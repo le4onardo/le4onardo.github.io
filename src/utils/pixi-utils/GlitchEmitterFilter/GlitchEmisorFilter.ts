@@ -3,7 +3,7 @@ import Repeater from './Repeater';
 
 export default class GlitchEmisorFilter extends GlitchFilter {
   private rangeOptions: Partial<GlitchFilterOptions>;
-  private repeater: Repeater;
+  private repeater?: Repeater;
   private _intensity = 0;
 
   constructor(
@@ -13,7 +13,6 @@ export default class GlitchEmisorFilter extends GlitchFilter {
   ) {
     super(options);
     this.rangeOptions = rangeOptions || {};
-    this.repeater = new Repeater();
     this._intensity = intensity;
   }
 
@@ -96,10 +95,18 @@ export default class GlitchEmisorFilter extends GlitchFilter {
   };
 
   public startGlitch(duration = 0) {
+    if (!!this.repeater) return;
+
+    this.repeater = new Repeater();
     this.repeater.start(this.applyRandomGlitch, duration);
   }
 
   public stopGlitch() {
-    this.repeater.stop();
+    this.repeater?.stop();
+    this.repeater = undefined;
+  }
+
+  public running() {
+    return !!this.repeater;
   }
 }

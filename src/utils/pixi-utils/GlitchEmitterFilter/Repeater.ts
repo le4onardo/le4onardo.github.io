@@ -8,5 +8,6 @@ export default class Repeater {
 
   stop = () => {
     clearInterval(this.processID);
+    this.processID = 0;
   };
 }
