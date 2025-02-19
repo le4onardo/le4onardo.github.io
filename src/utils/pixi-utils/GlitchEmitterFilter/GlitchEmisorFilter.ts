@@ -1,5 +1,5 @@
 import { GlitchFilter, GlitchFilterOptions } from '@pixi/filter-glitch';
-import Repeater from './Repeater';
+import Repeater from '../../Repeater';
 
 export default class GlitchEmisorFilter extends GlitchFilter {
   private rangeOptions: Partial<GlitchFilterOptions>;

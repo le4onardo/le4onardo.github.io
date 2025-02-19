@@ -4,6 +4,7 @@ import NavigationBar from '../../organisms/NavigationBar/NavigationBar';
 import './MainLayout.css';
 import { AssestType, assets } from '../../../utils/data';
 import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
+import CRTEmisorFilter from '../../../utils/pixi-utils/CRTEmitterFilter/CRTEmitterFilter';
 
 interface Props {
   children: React.ReactNode;
@@ -12,23 +13,23 @@ interface Props {
 
 const getRandomVideo = () => assets[Math.floor(Math.random() * assets.length)];
 const MAX_GLITCH_INDEX = 0.3
-const GLITCH_DEGRADING_FACTOR = 0.005
+const GLITCH_LOSS = 0.005
+const CRT_LOSS = 0.01
 const NEXT_VIDEO_THRESHOLD = 15
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
   const loadThreshold = useRef(0);
-  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(getRandomVideo());
+  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(assets[20]);
   const [nextVideo, setNextVideo] = useState<AssestType>(getRandomVideo());
-  const [asciiSize, setAsciiSize] = useState(1);
 
   const cachedTickFn = (
-    filters: { glitch: GlitchEmisorFilter },
+    filters: { glitch: GlitchEmisorFilter, crt: CRTEmisorFilter },
     loading: boolean
   ) => {
-    const { glitch } = filters;
+    const { glitch, crt } = filters;
 
     if (loading) {
-      glitch.intensity = MAX_GLITCH_INDEX;
+      // glitch.intensity = MAX_GLITCH_INDEX;
       return;
     }
 
@@ -47,18 +48,22 @@ const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
     }
 
     // Smooth glitch reduction over time
-    glitch.intensity = Math.max(glitch.intensity - GLITCH_DEGRADING_FACTOR, 0);
+    glitch.intensity = Math.max(glitch.intensity - GLITCH_LOSS, 0);
+    crt.intensity = Math.max(crt.intensity - CRT_LOSS, 0);
   };
 
 
   return (
-    <div className={`main-layout ${classProps}`}
-      onMouseDownCapture={() => { setAsciiSize(2); }}
-      onMouseUp={() => { setAsciiSize(1); }}
-      onMouseLeave={() => { setAsciiSize(1); }}
-    >
+    <div className={`main-layout ${classProps}`}>
       <div className={`pixi-container`}>
-        <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} ticker={cachedTickFn} asciiSize={asciiSize} />
+        <link rel="" href={backgroundVideo.backgroundUrl} type="image/png" />
+        {
+          // <img style={{ height: 700, width: 1400 }} src={backgroundVideo.backgroundUrl}></img>
+          <>
+            <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} ticker={cachedTickFn} />
+          </>
+          // assets.map(videoData => <PixiBackground height={700} width={1400} videoData={videoData} />)
+        }
       </div>
       <div className={'main-layout-container'}>
         <NavigationBar />

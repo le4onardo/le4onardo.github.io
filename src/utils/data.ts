@@ -204,7 +204,7 @@ export const assets: AssestType[] = [
         crtVignettingBlur: 0.25,
 
         // 0.3,
-        crtVignettingAlpha: 0.98
+        crtVignettingAlpha: 1
     },
 
 ];

@@ -1,10 +1,11 @@
 import { useRef, useEffect, memo } from 'react';
 import './PixiBackground.css';
 import { Application, Sprite, Texture, Ticker } from 'pixi.js';
-import { CRTFilter } from 'pixi-filters';
+import { CRTFilter, OldFilmFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
 import { AssestType } from '../../../utils/data';
 import { fetchVideoInMedia } from '../../../services/media';
+import CRTEmisorFilter from '../../../utils/pixi-utils/CRTEmitterFilter/CRTEmitterFilter';
 
 function resizeSprite(newWidth: number, newHeight: number, sprite: Sprite) {
   // INFO: changing sprite size to keep aspect ratio. Only to 75% of new width.
@@ -32,7 +33,7 @@ interface Props {
   ticker?: (
     filters: {
       glitch: GlitchEmisorFilter,
-      crt: CRTFilter,
+      crt: CRTEmisorFilter,
     }, loading: boolean
   ) => void,
 }
@@ -47,7 +48,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
   const loading = useRef<boolean>(false);
   const mediaRequest = useRef<Promise<HTMLVideoElement | HTMLImageElement>>();
   const filtersRef = useRef<{
-    crt: CRTFilter,
+    crt: CRTEmisorFilter,
     glitch: GlitchEmisorFilter
   }>();
 
@@ -98,8 +99,16 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
     async function onPixiInit() {
       const backSprite = new Sprite();
       const sprite = new Sprite();
-      const crt = new CRTFilter();
+      const crt = new CRTEmisorFilter({
+        vignetting: videoData.crtVignetting,
+        vignettingAlpha: videoData.crtVignettingAlpha,
+        vignettingBlur: videoData.crtVignettingBlur,
+        noiseSize: 1,
+        seed: Math.random(),
+        time: 0,
+      });
       const glitch = new GlitchEmisorFilter({ slices: 500, offset: 0 });
+      // const oldFilm = new OldFilmFilter({ vignetting: 0, vignettingAlpha: 0, vignettingBlur: 0 });
 
       spriteRef.current = sprite;
       filtersRef.current = { crt, glitch };
@@ -107,12 +116,6 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       backSprite.width = canvas.width;
       backSprite.height = canvas.height;
 
-      crt.noise = 0;
-      crt.curvature = 0;
-      crt.lineWidth = 0;
-      crt.lineContrast = 0;
-      crt.seed = 0;
-      crt.time = 0;
 
       pixiApp.stage.addChild(backSprite);
       pixiApp.stage.addChild(sprite);
@@ -120,6 +123,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       pixiApp.stage.filters = [glitch];
 
       setTimeout(() => glitch.startGlitch(), 100);
+      crt.startGlitch();
 
       /*
       sprite.texture = Texture.from(videoData.backgroundUrl);
@@ -156,9 +160,9 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {
-      const { glitch } = filtersRef.current || {};
+      const { glitch, crt } = filtersRef.current || {};
 
-      if (!glitch || loading.current) return;
+      if (!glitch || !crt || loading.current) return;
 
       const x = event.movementX;
       const y = event.movementY;
@@ -173,6 +177,19 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
     document.addEventListener('mousemove', onMouseMove);
     return () => document.removeEventListener('mousemove', onMouseMove);
   }, []);
+
+  useEffect(() => {
+    const onMouseClick = () => {
+      const { crt } = filtersRef.current || {};
+
+      if (!crt || loading.current) return;
+
+      crt.intensity = Math.min(crt.intensity + Math.random() * 0.5, 1);
+      console.log(crt.intensity)
+    }
+    document.addEventListener('click', onMouseClick);
+    return () => document.removeEventListener('click', onMouseClick);
+  }, [])
 
 
   useEffect(() => {
