@@ -6,7 +6,7 @@ export default class CRTEmisorFilter extends CRTFilter {
     private rangeOptions: Partial<CRTFilterOptions>;
     private repeater?: Repeater;
     private _intensity = 0;
-    private initialOptions?: Partial<CRTFilterOptions>;
+    private _defaultOptions?: Partial<CRTFilterOptions>;
 
     constructor(
         options?: Partial<CRTFilterOptions>,
@@ -14,10 +14,10 @@ export default class CRTEmisorFilter extends CRTFilter {
         intensity = 0
     ) {
         super(options);
-        this.initialOptions = options;
+
         this.rangeOptions = rangeOptions || {};
         this._intensity = intensity;
-
+        this._defaultOptions = options;
     }
 
     public get intensity() {
@@ -28,8 +28,8 @@ export default class CRTEmisorFilter extends CRTFilter {
         this._intensity = intensity;
     }
 
-    private getRandomNoise(intensity = 1) {
-        return Math.random() * intensity;
+    public set defaultOptions(defaultOptions: Partial<CRTFilterOptions>) {
+        this._defaultOptions = defaultOptions
     }
 
 
@@ -49,21 +49,21 @@ export default class CRTEmisorFilter extends CRTFilter {
 
     private getRandomCurvature(intensity = 1) {
         const weight = 20
-        const offset = 5
+        const offset = 10
 
         return (weight * Math.random() + offset) * intensity;
     }
 
     private getRandomVignetting(intensity = 1) {
         const weight = 0.05
-        const offset = this.initialOptions?.vignetting || 0
+        const offset = this._defaultOptions?.vignetting || 0
 
         return weight * Math.random() * intensity + offset;
     }
 
     private getRandomVignettingBlur(intensity = 1) {
         const weight = 0.1
-        const offset = this.initialOptions?.vignettingBlur || 0;
+        const offset = this._defaultOptions?.vignettingBlur || 0;
 
         return weight * Math.random() * intensity + offset;
     }

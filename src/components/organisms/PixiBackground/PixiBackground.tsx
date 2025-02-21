@@ -65,10 +65,6 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       sprite.texture = texture;
       resizeSprite(width, height, sprite);
 
-      crt.vignetting = videoData.crtVignetting;
-      crt.vignettingAlpha = videoData.crtVignettingAlpha
-      crt.vignettingBlur = videoData.crtVignettingBlur;
-
       canvasRef.current!.style.opacity = "1";
     } catch (error) {
       console.log('video load failed', videoData.url, error);
@@ -100,14 +96,18 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       const backSprite = new Sprite();
       const sprite = new Sprite();
       const crt = new CRTEmisorFilter({
-        vignetting: videoData.crtVignetting,
-        vignettingAlpha: videoData.crtVignettingAlpha,
-        vignettingBlur: videoData.crtVignettingBlur,
+        vignetting: 0.5, 
+        vignettingAlpha: 1,
+        vignettingBlur: 0.25,
         noiseSize: 1,
         seed: Math.random(),
         time: 0,
       });
-      const glitch = new GlitchEmisorFilter({ slices: 500, offset: 0 });
+      const glitch = new GlitchEmisorFilter({ slices: 500, offset: 0 }, {
+        red: [200, 200],
+        green: [200, 200],
+        blue: [200, 200],
+      });
       // const oldFilm = new OldFilmFilter({ vignetting: 0, vignettingAlpha: 0, vignettingBlur: 0 });
 
       spriteRef.current = sprite;
@@ -173,7 +173,9 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
         glitch.intensity + increment,
         0.3
       );
+      crt.intensity = Math.min(crt.intensity + increment * 6, 1);
     };
+
     document.addEventListener('mousemove', onMouseMove);
     return () => document.removeEventListener('mousemove', onMouseMove);
   }, []);
@@ -184,8 +186,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
 
       if (!crt || loading.current) return;
 
-      crt.intensity = Math.min(crt.intensity + Math.random() * 0.5, 1);
-      console.log(crt.intensity)
+      crt.intensity = Math.min(crt.intensity + 0.2, 1);
     }
     document.addEventListener('click', onMouseClick);
     return () => document.removeEventListener('click', onMouseClick);
