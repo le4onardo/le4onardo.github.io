@@ -2,6 +2,11 @@ import { useCallback, useState } from 'react';
 import { useGlitch } from 'react-powerglitch';
 import { PowerGlitchOptions, RecursivePartial, mergeOptions } from 'powerglitch'
 
+/**
+ * See https://7ph.github.io/powerglitch/#/playground
+ * @param options 
+ * @returns 
+ */
 
 const useGlitcher = (options: RecursivePartial<PowerGlitchOptions> & {
     colors?: string[],
@@ -38,19 +43,23 @@ const useGlitcher = (options: RecursivePartial<PowerGlitchOptions> & {
     }, glitchOptions));
 
     const ref = useCallback((node: HTMLElement | null) => {
-        if (!node) {
-            return;
-        }
-        const colors = glitchOptions?.colors?.length ? glitchOptions?.colors : ['red', 'green', 'blue', 'inherit'];
-        glitch.ref(node);
-        // Must be placed after glitch.ref because it changes parent and adds children
-        const glitchElements = node.children
+        try {
+            if (!node) {
+                return;
+            }
+            const colors = glitchOptions?.colors?.length ? glitchOptions?.colors : ['red', 'green', 'blue', 'inherit'];
+            glitch.ref(node);
+            // Must be placed after glitch.ref because it changes parent and adds children
+            const glitchElements = node.children
 
-        // Omitting 0 because is the actual react element displayed on screen
-        for (let i = 1; i < glitchElements.length; i++) {
-            const el = glitchElements[i] as HTMLElement;
-            el.style.setProperty('color', colors[(i - 1) % colors.length], 'important');
-            el.classList.add('glitch-layer');
+            // Omitting 0 because is the actual react element displayed on screen
+            for (let i = 1; i < glitchElements.length; i++) {
+                const el = glitchElements[i] as HTMLElement;
+                el.style.setProperty('color', colors[(i - 1) % colors.length], 'important');
+                el.classList.add('glitch-layer');
+            }
+        } catch (e) {
+            console.warn('GLITCHER ERROR:', e);
         }
     }, [glitchOptions])
 

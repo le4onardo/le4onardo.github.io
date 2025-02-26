@@ -1,8 +1,9 @@
 import MainLayout from '../../components/templates/MainLayout/MainLayout';
-import PresentationCard from '../../components/molecules/PresentationCard/PresentationCard';
-import { cardsData } from '../../utils/data';
 import './Home.css';
 import useGlitcher from '../../hooks/useGlitcher';
+import Skills from '../../components/organisms/Skills/Skills';
+import AboutMe from '../../components/organisms/About/About';
+import Blogs from '../../components/organisms/Blogs/Blogs';
 
 const Home = () => {
   const { ref } = useGlitcher({
@@ -30,22 +31,11 @@ const Home = () => {
             {` the cursor to travel through the ascii multiverse!`}
           </div>
         </div>
-        <div className='cards-container'>
-          {
-            cardsData.map(({ title, description, writeDate, readTime }) =>
-              <PresentationCard
-                key={title}
-                title={title}
-                description={description}
-                writeDate={writeDate}
-                readTime={readTime}
-                redirectTo={title.replaceAll(' ', '_')}
-                onClick={() => { console.log('test') }}
-              />
-            )
-          }
-        </div>
       </div>
+      <AboutMe />
+      <Skills />
+      <Blogs />
+
     </MainLayout >
   );
 };
