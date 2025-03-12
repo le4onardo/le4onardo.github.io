@@ -10,7 +10,7 @@ export default function Link({ href, title, children, className = '', target = '
     const glitch = useGlitcher();
 
     return <a
-        className={twMerge('flex align-center decoration-transparent transition duration-250 ease-in-out hover:scale-125', className)}
+        className={twMerge('flex align-center decoration-transparent text-neutral-300 transition duration-400 ease-in-out hover:text-neutral-50', className)}
         href={href}
         target={target}
         rel={rel}

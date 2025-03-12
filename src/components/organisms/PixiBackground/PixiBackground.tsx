@@ -1,5 +1,4 @@
 import { useRef, useEffect, memo } from 'react';
-import './PixiBackground.css';
 import { Application, Sprite, Texture, Ticker } from 'pixi.js';
 import { CRTFilter, OldFilmFilter } from 'pixi-filters';
 import GlitchEmisorFilter from '../../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
@@ -96,7 +95,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
       const backSprite = new Sprite();
       const sprite = new Sprite();
       const crt = new CRTEmisorFilter({
-        vignetting: 0.5, 
+        vignetting: 0.5,
         vignettingAlpha: 1,
         vignettingBlur: 0.25,
         noiseSize: 1,
@@ -198,7 +197,7 @@ const PixiBackground: React.FC<Props> = ({ height, width, videoData, ticker, nex
   }, [videoData]);
 
 
-  return <canvas className='pixi-background' ref={canvasRef} />;
+  return <canvas className='pixi-background absolute top-0 left-0 opacity-0' ref={canvasRef} />;
 };
 
 export default memo(PixiBackground);

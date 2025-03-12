@@ -1,4 +1,3 @@
-import './NavigationBar.css';
 import Link from '../../atoms/Link';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,21 +6,22 @@ interface Props {
 }
 
 const NavigationBar = ({ className }: Props) => {
+
   return (
-    <div className={twMerge('flex justify-between items-center gap-10 backdrop-blur-sm', className)}>
-      <Link href='#' className='mr-auto'>
+    <div className={twMerge('mt-0 gap-2.5 flex justify-between items-center lg:gap-10 backdrop-blur-sm ', className)}>
+      < Link href='#' className='mr-auto' >
         <div className="">Home</div>
-      </Link>
-      <Link href='#AboutMe'>
-        <div className="">Skills</div>
-      </Link>
-      <Link href='#Skills'>
+      </Link >
+      <Link href='#about'>
         <div className="">About me</div>
       </Link>
-      <Link href='#Blogs'>
+      <Link href='#skills'>
+        <div className="">Skills</div>
+      </Link>
+      <Link href='#blogs'>
         <div className="">Blog</div>
       </Link>
-    </div>
+    </div >
   );
 };
 
