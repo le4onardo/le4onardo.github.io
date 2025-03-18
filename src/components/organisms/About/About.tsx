@@ -1,6 +1,11 @@
+import { twMerge } from "tailwind-merge";
 import useGlitcher from "../../../hooks/useGlitcher"
 
-export default function AboutMe() {
+interface Props {
+    className?: string;
+}
+
+export default function AboutMe({ className = '' }: Props) {
     const { ref } = useGlitcher({
         playMode: 'click',
         timing: { duration: 2000, iterations: Infinity, easing: 'ease-in-out' },
@@ -11,7 +16,7 @@ export default function AboutMe() {
             amplitudeY: 0.05,
         },
         slice: {
-            count: 10,
+            count: 12,
             velocity: 30,
             minHeight: 0.1,
             maxHeight: 0.2,
@@ -19,11 +24,11 @@ export default function AboutMe() {
         },
     })
 
-    return <div className='mt-24'>
-        <div ref={ref}>
+    return <div className={twMerge('pt-30', className)} id='about'>
+        <div className='w-fit' ref={ref}>
             <h2 className='text-4xl mb-20 w-fit' >ABOUT ME</h2>
         </div>
-        <p className='lg:w-2/5 w-full'>
+        <p className='lg:w-96 w-full'>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
             exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
