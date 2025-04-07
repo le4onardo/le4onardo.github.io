@@ -8,13 +8,20 @@ import { twMerge } from "tailwind-merge";
 
 gsap.registerPlugin(useGSAP);
 
-const professions = ['Developer', 'Engineer', 'Craftsman', 'Artisan'];
-const colors = ['#FFC0CB', '#7CFC00', '#87CEFA', '#FFFF00'];
+const professions = ['Developer', 'Passionate', 'Engineer', 'Craftsman', 'Artisan'];
+const colors = [
+    '#FFC0CB', // Pink
+    '#FFA500', // Orange
+    '#FFFF00', // Yellow
+    '#7CFC00', // Light Green
+    '#87CEFA'  // Light Blue
+];
 
 interface Props {
     className?: string;
+    onColorChange?: (color: string, index: number) => void;
 }
-export default function Hero({ className = '' }: Props) {
+export default function Hero({ onColorChange, className = '' }: Props) {
     const container = useRef<HTMLDivElement>(null);
     const [active, setActive] = useState<number>(0);
     const transition = useRef<boolean>(false);
@@ -93,6 +100,8 @@ export default function Hero({ className = '' }: Props) {
             onStart: () => { console.log('draw', professions[nextActive]) }
         }, '<+=0.05');
 
+        onColorChange &&
+            onColorChange(colors[nextActive], nextActive);
         setActive(nextActive);
     });
 
@@ -121,6 +130,7 @@ export default function Hero({ className = '' }: Props) {
                 {
                     professions.map((prof, index) => {
                         return <TextAnimator
+                            key={index}
                             text={prof}
                             className={active === index ? "relative z-10 top-0 left-0 w-fit" : "absolute top-0 left-0"}
                             charStyles={{
