@@ -10,9 +10,10 @@
 }
 
 .pixi-container {
-    width: var(--background-width);
+    width: 100%;
     height: 700px;
     right: -150px;
+    overflow-x: hidden;
     position: absolute;
 }
 
