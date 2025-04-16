@@ -4,6 +4,10 @@ import toSingleChars from "../../utils/string";
 import gsap from 'gsap';
 import { TextAnimator } from "../molecules/TextAnimator";
 import { twMerge } from "tailwind-merge";
+import CodeIcon from "../icons/CodeIcon";
+import GearIcon from "../icons/GearIcon";
+import SeedlingIcon from "../icons/SeedlingIcon";
+import SparklesIcon from "../icons/SparklesIcon";
 
 
 gsap.registerPlugin(useGSAP);
@@ -57,7 +61,7 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             stagger: 0.05,
         }, '+=0.5');
 
-        tl.to(`div[data-sentence="${professions[active]}"]  p`, {
+        tl.to(`.profession-${active} p, .profession-${active} svg `, {
             opacity: 1,
             filter: 'blur(0px)',
             duration: 0.5,
@@ -69,12 +73,15 @@ export default function Hero({ onColorChange, className = '' }: Props) {
     }, { scope: container });
 
     const onClick = contextSafe((e: any) => {
-        const position = [...(e.target as HTMLElement).parentElement!.childNodes].findIndex(node => node === e.target);
+        const target = e.target as HTMLElement;
+        const position = target instanceof SVGElement ? professions[active].length :
+            [...target.parentElement!.childNodes].findIndex(node => node === e.target);
+
         const nextActive = (active + 1) % professions.length;
         let tl = gsap.timeline();
         console.log(professions[active], professions[nextActive], position)
 
-        tl.to(`div[data-word="${professions[active]}"] p`, {
+        tl.to(`.profession-${active} p, .profession-${active} svg `, {
             opacity: 0,
             filter: 'blur(10px)',
             scale: 5,
@@ -87,23 +94,33 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             },
             onStart: () => { console.log('erase', professions[active]) }
         });
-        tl.to(`div[data-word="${professions[nextActive]}"]  p`, {
+        tl.to(`.profession-${nextActive} p, .profession-${nextActive} svg `, {
             opacity: 1,
             duration: 0.3,
             filter: 'blur(0px)',
             scale: 1,
             color: colors[nextActive],
             stagger: {
-                from: Math.min(position, professions[nextActive].length - 1),
+                from: Math.min(position, professions[nextActive].length),
                 each: 0.05
             },
-            onStart: () => { console.log('draw', professions[nextActive]) }
+            onStart: () => { console.log('draw', professions[nextActive]) },
+            //onComplete: () => {  }
         }, '<+=0.05');
 
-        onColorChange &&
+        if (onColorChange) {
             onColorChange(colors[nextActive], nextActive);
+        }
         setActive(nextActive);
     });
+
+    const buttonColors = [
+        'hover:text-shadow-[0_5px_12px_pink]',
+        'hover:text-shadow-[0_5px_12px_orange]',
+        'hover:text-shadow-[0_5px_12px_yellow]',
+        'hover:text-shadow-[0_5px_12px_lightgreen]',
+        'hover:text-shadow-[0_5px_12px_lightblue]',
+    ]
 
     return <div className={twMerge('bg-transparent flex flex-col justify-evenly  text-black', className)} ref={container}>
         <h1 className='max-w-none m-auto text-center mt-24 text-[6rem]
@@ -117,30 +134,51 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             }} />
         </h1>
 
-        <TextAnimator text='Leonardo Rios' charStyles={{
-            opacity: '0',
-            filter: 'blur(10px)',
-        }} />
-        <div className='prof-container relative flex w-52'>
-            <TextAnimator className="" text='Software ' charStyles={{
-                opacity: '0',
-                filter: 'blur(10px)',
-            }} />
-            <button style={{ textShadow: '0 2px 10px' }} className="relative cursor-pointer w-28" onClick={onClick}>
-                {
-                    professions.map((prof, index) => {
-                        return <TextAnimator
-                            key={index}
-                            text={prof}
-                            className={active === index ? "relative z-10 top-0 left-0 w-fit" : "absolute top-0 left-0"}
-                            charStyles={{
-                                opacity: '0',
-                                filter: 'blur(10px)',
-                            }} />
-                    })
-                }
+        <TextAnimator text='Leonardo Rios' charClassName="opacity-0 blur-md" />
+        <div className='prof-container relative flex'>
+            <TextAnimator className="" text='Software ' charClassName="opacity-0 blur-md" />
+            <button className={`relative cursor-pointer overflow transition-[text-shadow]  duration-400 ${buttonColors[active]}`} onClick={onClick}>
+                <div className={`whitespace-nowrap top-0 left-0 profession-0 ${active === 0 ? "relative z-10" : "absolute"}`}>
+                    <TextAnimator
+                        text={professions[0]}
+                        className="inline"
+                        charClassName="opacity-0 blur-md"
+                    />
+                    <CodeIcon stroke={colors[0]} className="opacity-0 inline blur" />
+                </div>
+                <div className={`whitespace-nowrap top-0 left-0 profession-1 ${active === 1 ? "relative z-10" : "absolute"}`}>
+                    <TextAnimator
+                        text={professions[1]}
+                        className="inline"
+                        charClassName="opacity-0 blur-md"
+                    />
+                    <GearIcon stroke={colors[1]} className="opacity-0 inline blur" />
+                </div>
+                <div className={`whitespace-nowrap top-0 left-0 profession-2 ${active === 2 ? "relative z-10" : "absolute"}`}>
+                    <TextAnimator
+                        text={professions[2]}
+                        className="inline"
+                        charClassName="opacity-0 blur-md"
+                    />
+                    <SeedlingIcon stroke={colors[2]} className="opacity-0 inline blur" />
+                </div>
+                <div className={`whitespace-nowrap top-0 left-0 profession-3 ${active === 3 ? "relative z-10" : "absolute"}`}>
+                    <TextAnimator
+                        text={professions[3]}
+                        className="inline"
+                        charClassName="opacity-0 blur-md"
+                    />
+                    <SparklesIcon stroke={colors[3]} className="opacity-0 inline blur" />
+                </div>
+                <div className={`whitespace-nowrap top-0 left-0 profession-4 ${active === 4 ? "relative z-10" : "absolute"}`}>
+                    <TextAnimator
+                        text={professions[4]}
+                        className="inline"
+                        charClassName="opacity-0 blur-md"
+                    />
+                    <CodeIcon stroke={colors[4]} className="opacity-0 inline blur" />
+                </div>
             </button>
-            <div className="prof-shadow absolute h-full w-2.5 left-[-30px] shadow-[0_0_19px_16px_black] rounded-e-full z-20 bg-black" />
         </div>
     </div>
 }
