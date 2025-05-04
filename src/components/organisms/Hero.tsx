@@ -3,17 +3,13 @@ import { useRef, useState } from "react";
 import gsap from 'gsap';
 import { TextAnimator } from "../molecules/TextAnimator";
 import { twMerge } from "tailwind-merge";
-import CodeIcon, { codeIconGsap } from "../icons/CodeIcon";
-import GearIcon, { gearIconGsap } from "../icons/GearIcon";
-import SeedlingIcon, { seedlingIconGsap } from "../icons/SeedlingIcon";
-import SparklesIcon, { sparklesIconGsap } from "../icons/SparklesIcon";
 import LordIcon from "../icons/LordIcon";
 import { Player } from '@lordicon/react';
 
 
 gsap.registerPlugin(useGSAP);
 
-const states = [
+const roles = [
     {
         profession: 'Developer',
         iconData: {
@@ -22,48 +18,46 @@ const states = [
             hover: 'hover-pinch'
         },
         color: '#FFC0CB', // Pink
-        animations: codeIconGsap,
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink]'
     },
     {
         profession: 'Passionate',
         iconData: {
-            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-40-cogs.json',
+            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-20-love-heart-hover-heartbeat-alt.json',
             reveal: 'in-reveal',
-            hover: 'loop-rotation',
-            // loop
-            onComplete: (player?: Player) => { player?.playFromBeginning() }
+            hover: 'hover-heartbeat',
         },
-
         color: '#FFA500', // Orange
-        animations: gearIconGsap,
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_orange]'
     },
     {
         profession: 'Engineer',
         iconData: {
             url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-40-cogs.json',
+            reveal: 'in-reveal',
+            hover: 'loop-rotation',
         },
         color: '#FFFF00', // Yellow
-        animations: seedlingIconGsap,
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_yellow]'
     },
     {
         profession: 'Craftsman',
         iconData: {
-            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-40-cogs.json',
+            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-35-edit-hover-circle.json',
+            reveal: 'in-dynamic',
+            hover: 'hover-line',
         },
         color: '#7CFC00',   // Light Green
-        animations: sparklesIconGsap,
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightgreen]'
     },
     {
         profession: 'Artisan',
         iconData: {
-            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-40-cogs.json',
+            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/brush.json',
+            reveal: 'in-reveal',
+            hover: 'hover-pinch',
         },
         color: '#87CEFA', // Light Blue
-        animations: codeIconGsap,
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightblue]'
     },
 ]
@@ -74,19 +68,15 @@ interface Props {
 }
 
 export default function Hero({ onColorChange, className = '' }: Props) {
+    const [active, setActive] = useState<number>(4);
+    const [iconState, setIconState] = useState<string>('in-reveal');
+    const [hover, setHover] = useState(false);
     const container = useRef<HTMLDivElement>(null);
-    const [active, setActive] = useState<number>(0);
-    const iconTimeline = useRef<gsap.core.Timeline>();
-    const [iconState, setIconState] = useState<string>();
     const iconsPlayers = useRef<Array<Player | null>>([]);
+
 
     const { contextSafe } = useGSAP(() => {
         let mainTimeline = gsap.timeline();
-        iconTimeline.current = gsap.timeline();
-        states[active].animations.forEach(({ targets, vars, position, method }) => {
-            iconTimeline.current![method](targets, vars, position);
-        });
-        iconTimeline.current!.pause();
 
         mainTimeline.to('h1 p', {
             opacity: 1,
@@ -121,7 +111,7 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             opacity: 1,
             filter: 'blur(0px)',
             duration: 0.5,
-            color: states[active].color,
+            color: roles[active].color,
             scale: 1,
             stagger: 0.05,
         }, '-=0.5');
@@ -136,15 +126,16 @@ export default function Hero({ onColorChange, className = '' }: Props) {
     }, { scope: container });
 
     const onClick = contextSafe((e: any) => {
-        const nextActive = (active + 1) % states.length;
-        const { profession, color } = states[active];
+        const nextActive = (active + 1) % roles.length;
+        const role = roles[active]
+        const nextRole = roles[nextActive];
         const target = e.target as HTMLElement;
-        const position = target instanceof SVGElement ? profession.length :
+        const position = target instanceof SVGElement ? role.profession.length :
             [...target.parentElement!.childNodes].findIndex(node => node === e.target);
 
 
         let tl = gsap.timeline();
-        console.log(profession, profession[nextActive], position)
+        // console.log(profession, profession[nextActive], position)
 
         tl.to(`.profession-${active} p, .profession-${active} .lordicon `, {
             opacity: 0,
@@ -164,9 +155,9 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             duration: 0.3,
             filter: 'blur(0px)',
             scale: 1,
-            color: states[nextActive].color,
+            color: nextRole.color,
             stagger: {
-                from: Math.min(position, states[nextActive].profession.length),
+                from: Math.min(position, nextRole.profession.length),
                 each: 0.05
             },
         }, '<+=0.05');
@@ -176,21 +167,27 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             filter: 'blur(0px)',
             scale: 1,
             onComplete: () => {
-                iconsPlayers.current[nextActive]?.playFromBeginning()
+                setIconState(nextRole.iconData.reveal);
+                iconsPlayers.current[nextActive]?.play()
             }
         });
 
         if (onColorChange) {
-            onColorChange(states[nextActive].color, nextActive);
+            onColorChange(nextRole.color, nextActive);
         }
-        setIconState('in-reveal');
         setActive(nextActive);
     });
 
-    const onHover = contextSafe((e: React.MouseEvent<HTMLButtonElement>) => {
-        setIconState(states[active].iconData.hover);
-        iconsPlayers.current[active]?.playFromBeginning();
-    });
+    const onHover = (e: React.MouseEvent<HTMLButtonElement>) => {
+        setHover(true);
+        const playerRef = iconsPlayers.current[active];
+
+        if (!playerRef?.isPlaying && iconState === roles[active].iconData.hover) {
+            // console.log('hover play!');
+            playerRef?.play();
+        }
+    };
+
 
     return <div className={twMerge('bg-transparent flex flex-col justify-evenly  text-black', className)} ref={container}>
         <h1 className='max-w-none m-auto text-center mt-24 text-[6rem]
@@ -211,13 +208,14 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                 className={twMerge("relative cursor-pointer inline")}
                 onClick={onClick}
                 onMouseEnter={onHover}
+                onMouseLeave={() => setHover(false)}
             >
                 {
-                    states.map(({ profession, buttonClassname, iconData, color }, index) => {
+                    roles.map(({ profession, buttonClassname, iconData, color }, index) => {
                         return <div
                             key={index}
                             className={twMerge(
-                                `flex items-center whitespace-nowrap top-0 left-0 profession-${index}`,
+                                `flex items-center gap-2 whitespace-nowrap top-0 left-0 profession-${index}`,
                                 active === index ? "relative z-10" : "absolute",
                                 buttonClassname
                             )}
@@ -229,10 +227,26 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                             <LordIcon
                                 ref={el => iconsPlayers.current[index] = el}
                                 url={iconData.url}
-                                // onComplete={iconData.onComplete ? () => iconData.onComplete(iconsPlayers.current[index]) : undefined}
                                 size={30}
                                 colorize={color}
                                 state={iconState}
+                                onComplete={() => {
+                                    if (active !== index) return;
+
+                                    const role = roles[index];
+                                    const playerRef = iconsPlayers.current[index];
+
+                                    // console.log('complete', role.profession, iconState, hover)
+                                    if (iconState === role.iconData.reveal) {
+                                        setIconState(role.iconData.hover);
+                                        hover ? playerRef?.play() : playerRef?.pause();
+                                        return;
+                                    }
+
+                                    if (iconState === role.iconData.hover) {
+                                        hover && playerRef?.playFromBeginning();
+                                    }
+                                }}
                                 className={'opacity-0 lordicon'}
                             />
                         </div>

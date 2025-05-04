@@ -6,7 +6,6 @@ import { IPlayerOptions } from '@lordicon/react/dist/interfaces';
 export interface LordIconProps extends Omit<IPlayerOptions, "icon"> {
     className?: string
     url: string
-    loop?: boolean
 }
 
 declare global {
@@ -18,9 +17,8 @@ declare global {
     }
 }
 
-function LordIcon({ url, loop, className = '', ...props }: LordIconProps, ref: ForwardedRef<Player>) {
+function LordIcon({ url, className = '', ...props }: LordIconProps, ref: ForwardedRef<Player>) {
     const [iconData, setIconData] = useState<string | null>(null);
-    const localRef = useRef<Player | null>();
 
     useEffect(() => {
         fetch(url).then(
@@ -34,13 +32,9 @@ function LordIcon({ url, loop, className = '', ...props }: LordIconProps, ref: F
             {
                 !!iconData && <Player
                     ref={(el) => {
-                        localRef.current = el;
                         typeof ref === 'function' && ref(el)
                     }}
                     icon={iconData}
-                    onComplete={() => {
-                        loop && localRef?.current?.playFromBeginning()
-                    }}
                     {...props}
                 />
             }
