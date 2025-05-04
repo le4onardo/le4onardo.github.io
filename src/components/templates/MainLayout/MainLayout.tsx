@@ -13,7 +13,7 @@ interface Props {
 
 const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [scroll, setScroll] = useState(true);
+  const [scroll, setScroll] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScroll(window.scrollY > 0);
 
