@@ -17,16 +17,6 @@ const roles = [
             reveal: 'in-reveal',
             hover: 'hover-pinch'
         },
-        color: '#FFC0CB', // Pink
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink]'
-    },
-    {
-        profession: 'Passionate',
-        iconData: {
-            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-20-love-heart-hover-heartbeat-alt.json',
-            reveal: 'in-reveal',
-            hover: 'hover-heartbeat',
-        },
         color: '#FFA500', // Orange
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_orange]'
     },
@@ -60,6 +50,16 @@ const roles = [
         color: '#87CEFA', // Light Blue
         buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightblue]'
     },
+    {
+        profession: 'Passionate',
+        iconData: {
+            url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-20-love-heart-hover-heartbeat-alt.json',
+            reveal: 'in-reveal',
+            hover: 'hover-heartbeat',
+        },
+        color: '#FFC0CB', // Pink
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink]'
+    },
 ]
 
 interface Props {
@@ -68,7 +68,7 @@ interface Props {
 }
 
 export default function Hero({ onColorChange, className = '' }: Props) {
-    const [active, setActive] = useState<number>(4);
+    const [active, setActive] = useState<number>(0);
     const [iconState, setIconState] = useState<string>('in-reveal');
     const [hover, setHover] = useState(false);
     const container = useRef<HTMLDivElement>(null);
@@ -130,12 +130,10 @@ export default function Hero({ onColorChange, className = '' }: Props) {
         const role = roles[active]
         const nextRole = roles[nextActive];
         const target = e.target as HTMLElement;
-        const position = target instanceof SVGElement ? role.profession.length :
+        const position = target.tagName === 'DIV' ? role.profession.length :
             [...target.parentElement!.childNodes].findIndex(node => node === e.target);
 
-
         let tl = gsap.timeline();
-        // console.log(profession, profession[nextActive], position)
 
         tl.to(`.profession-${active} p, .profession-${active} .lordicon `, {
             opacity: 0,
@@ -150,6 +148,9 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                 each: 0.05
             },
         });
+        tl.set(`.profession-${active} p, .profession-${active} .lordicon`, {
+            scale: 1
+        })
         tl.to(`.profession-${nextActive} p`, {
             opacity: 1,
             duration: 0.3,
