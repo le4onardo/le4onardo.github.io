@@ -1,64 +1,65 @@
 import { useGSAP } from "@gsap/react";
 import { useRef, useState } from "react";
 import gsap from 'gsap';
-import { TextAnimator } from "../molecules/TextAnimator";
+import { SplitText } from "gsap/SplitText";
 import { twMerge } from "tailwind-merge";
 import LordIcon from "../icons/LordIcon";
 import { Player } from '@lordicon/react';
 
 
 gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(SplitText);
 
 const roles = [
     {
-        profession: 'Developer',
+        name: 'Developer',
         iconData: {
             url: "https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-742-code-hover-pinch.json",
             reveal: 'in-reveal',
             hover: 'hover-pinch'
         },
         color: '#FFA500', // Orange
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_orange]'
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_orange] text-[#FFA500]'
     },
     {
-        profession: 'Engineer',
+        name: 'Engineer',
         iconData: {
             url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-40-cogs.json',
             reveal: 'in-reveal',
             hover: 'loop-rotation',
         },
         color: '#FFFF00', // Yellow
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_yellow]'
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_yellow] text-[#FFFF00]'
     },
     {
-        profession: 'Craftsman',
+        name: 'Craftsman',
         iconData: {
             url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-35-edit-hover-circle.json',
             reveal: 'in-dynamic',
             hover: 'hover-line',
         },
         color: '#7CFC00',   // Light Green
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightgreen]'
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightgreen] text-[#7CFC00]'
     },
     {
-        profession: 'Artisan',
+        name: 'Artisan',
         iconData: {
             url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/brush.json',
             reveal: 'in-reveal',
             hover: 'hover-pinch',
         },
         color: '#87CEFA', // Light Blue
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightblue]'
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightblue] text-[#87CEFA]'
     },
     {
-        profession: 'Passionate',
+        name: 'Passionate',
         iconData: {
             url: 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/icons/wired-outline-20-love-heart-hover-heartbeat-alt.json',
             reveal: 'in-reveal',
             hover: 'hover-heartbeat',
         },
         color: '#FFC0CB', // Pink
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink]'
+        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink] text-[#FFC0CB]'
     },
 ]
 
@@ -73,41 +74,44 @@ export default function Hero({ onColorChange, className = '' }: Props) {
     const [hover, setHover] = useState(false);
     const container = useRef<HTMLDivElement>(null);
     const iconsPlayers = useRef<Array<Player | null>>([]);
-
+    const roleNames = useRef<SplitText[]>([]);
 
     const { contextSafe } = useGSAP(() => {
         let mainTimeline = gsap.timeline();
-
-        mainTimeline.to('h1 p', {
-            opacity: 1,
-            scale: 1,
-            top: 0,
-            left: 0,
-            color: '#ffffff',
+        let title = SplitText.create('.header-title', { type: "chars", smartWrap: true })
+        mainTimeline.from(title.chars, {
             duration: 1,
             stagger: 0.1,
-            filter: 'blur(0px)',
             ease: "elastic.out(1,0.5)",
+            filter: "blur(10px)",
+            scale: 3,
+            opacity: 0
         });
 
-        mainTimeline.to('div[data-sentence="Leonardo Rios"]  p', {
-            opacity: 1,
-            filter: 'blur(0px)',
-            color: '#ffffff',
+        let author = SplitText.create('.header-author', { type: "chars", smartWrap: true })
+        mainTimeline.from(author.chars, {
             duration: 0.5,
             stagger: 0.05,
+            opacity: 0,
+            filter: 'blur(10px)',
         }, '+=0.5');
 
-        mainTimeline.to(`div[data-sentence="Software "]  p`, {
-            opacity: 1,
-            filter: 'blur(0px)',
+        let software = SplitText.create('.header-software', { type: 'chars', smartWrap: true });
+        mainTimeline.from(software.chars, {
             duration: 0.5,
-            color: '#ffffff',
-            scale: 1,
             stagger: 0.05,
+            opacity: 0,
+            filter: 'blur(10px)',
         }, '+=0.5');
 
-        mainTimeline.to(`.profession-${active} p`, {
+        roles.map((_role, index) => {
+            roleNames.current[index] = SplitText.create(`.role-name-${index}`, {
+                type: 'chars',
+                charsClass: 'role-char opacity-0 blur-md'
+            })
+        }, []);
+
+        mainTimeline.to(roleNames.current[active].chars, {
             opacity: 1,
             filter: 'blur(0px)',
             duration: 0.5,
@@ -116,7 +120,7 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             stagger: 0.05,
         }, '-=0.5');
 
-        mainTimeline.set(`.profession-${active} .lordicon`, {
+        mainTimeline.set(`.role-${active} .lordicon`, {
             opacity: 1,
             onComplete: () => {
                 iconsPlayers.current[active]?.playFromBeginning()
@@ -130,12 +134,14 @@ export default function Hero({ onColorChange, className = '' }: Props) {
         const role = roles[active]
         const nextRole = roles[nextActive];
         const target = e.target as HTMLElement;
-        const position = target.tagName === 'DIV' ? role.profession.length :
-            [...target.parentElement!.childNodes].findIndex(node => node === e.target);
+        console.log('click', target.className)
+        const position = target.className.includes('role-char') ?
+            [...target.parentElement!.childNodes].findIndex(node => node === e.target) :
+            role.name.length;
 
         let tl = gsap.timeline();
 
-        tl.to(`.profession-${active} p, .profession-${active} .lordicon `, {
+        tl.to(`.role-${active} .role-char, .role-${active} .lordicon`, {
             opacity: 0,
             filter: 'blur(10px)',
             scale: 5,
@@ -148,22 +154,22 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                 each: 0.05
             },
         });
-        tl.set(`.profession-${active} p, .profession-${active} .lordicon`, {
+        tl.set(`.role-${active} .role-char, .role-${active} .lordicon`, {
             scale: 1
         })
-        tl.to(`.profession-${nextActive} p`, {
+        tl.to(`.role-${nextActive} .role-char`, {
             opacity: 1,
             duration: 0.3,
             filter: 'blur(0px)',
             scale: 1,
             color: nextRole.color,
             stagger: {
-                from: Math.min(position, nextRole.profession.length),
+                from: Math.min(position, nextRole.name.length),
                 each: 0.05
             },
         }, '<+=0.05');
 
-        tl.set(`.profession-${nextActive} .lordicon`, {
+        tl.set(`.role-${nextActive} .lordicon`, {
             opacity: 1,
             filter: 'blur(0px)',
             scale: 1,
@@ -190,21 +196,22 @@ export default function Hero({ onColorChange, className = '' }: Props) {
     };
 
 
-    return <div className={twMerge('bg-transparent flex flex-col justify-evenly  text-black', className)} ref={container}>
-        <h1 className='max-w-none m-auto text-center mt-24 text-[6rem]
-        lg:max-w-[30rem] lg:text-[60px] lg:mb-40 lg:mx-0 lg:mt-40 lg:font-bold lg:block lg:min-h-[288px] lg:text-left'>
-            <TextAnimator className='' text='The journey is the reward...' charStyles={{
-                opacity: '0',
-                scale: '3',
-                // left: `${Math.random() * 600 - 300}px`,
-                // top: `${Math.random() * 600 - 300}px`,
-                filter: 'blur(10px)'
-            }} />
-        </h1>
+    return <div className={twMerge('bg-transparent flex flex-col justify-evenly  text-white', className)} ref={container}>
+        <div className='max-w-none m-auto text-center mt-24 
+        text-[6rem] lg:max-w-[30rem] lg:text-[60px] lg:mb-40 lg:mx-0
+        lg:mt-40 lg:font-bold lg:block lg:min-h-[288px] lg:text-left'>
+            <h1 className="header-title">
+                The journey is the reward...
+            </h1>
+        </div>
 
-        <TextAnimator text='Leonardo Rios' charClassName="opacity-0 blur-md" />
-        <div className='relative flex items-center whitespace-nowrap' >
-            <TextAnimator className="inline" text='Software ' charClassName="opacity-0 blur-md" />
+        <span className='header-author'>
+            Leonardo Rios
+        </span>
+
+        <div className='relative flex gap-4 items-center'>
+            <span className="inline header-software">Software</span>
+
             <button
                 className={twMerge("relative cursor-pointer inline")}
                 onClick={onClick}
@@ -212,25 +219,23 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                 onMouseLeave={() => setHover(false)}
             >
                 {
-                    roles.map(({ profession, buttonClassname, iconData, color }, index) => {
+                    roles.map(({ name, buttonClassname, iconData, color }, index) => {
                         return <div
                             key={index}
                             className={twMerge(
-                                `flex items-center gap-2 whitespace-nowrap top-0 left-0 profession-${index}`,
+                                `flex items-center gap-2 whitespace-nowrap top-0 left-0 role-${index}`,
                                 active === index ? "relative z-10" : "absolute",
                                 buttonClassname
                             )}
                         >
-                            <TextAnimator
-                                text={profession}
-                                charClassName="opacity-0 blur-md"
-                            />
+                            <span className={`role-name-${index}`}>{name}</span>
                             <LordIcon
                                 ref={el => iconsPlayers.current[index] = el}
                                 url={iconData.url}
                                 size={30}
                                 colorize={color}
                                 state={iconState}
+                                className={'opacity-0 lordicon'}
                                 onComplete={() => {
                                     if (active !== index) return;
 
@@ -248,7 +253,6 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                                         hover && playerRef?.playFromBeginning();
                                     }
                                 }}
-                                className={'opacity-0 lordicon'}
                             />
                         </div>
                     })
