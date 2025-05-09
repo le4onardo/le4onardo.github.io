@@ -19,7 +19,7 @@ const roles = [
             hover: 'hover-pinch'
         },
         color: '#FFA500', // Orange
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_orange] text-[#FFA500]'
+        buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_orange] tw:text-[#FFA500]'
     },
     {
         name: 'Engineer',
@@ -29,7 +29,7 @@ const roles = [
             hover: 'loop-rotation',
         },
         color: '#FFFF00', // Yellow
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_yellow] text-[#FFFF00]'
+        buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_yellow] tw:text-[#FFFF00]'
     },
     {
         name: 'Craftsman',
@@ -39,7 +39,7 @@ const roles = [
             hover: 'hover-line',
         },
         color: '#7CFC00',   // Light Green
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightgreen] text-[#7CFC00]'
+        buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_lightgreen] tw:text-[#7CFC00]'
     },
     {
         name: 'Artisan',
@@ -49,7 +49,7 @@ const roles = [
             hover: 'hover-pinch',
         },
         color: '#87CEFA', // Light Blue
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_lightblue] text-[#87CEFA]'
+        buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_lightblue] tw:text-[#87CEFA]'
     },
     {
         name: 'Passionate',
@@ -59,7 +59,7 @@ const roles = [
             hover: 'hover-heartbeat',
         },
         color: '#FFC0CB', // Pink
-        buttonClassname: 'transition-[filter] duration-400 hover:drop-shadow-[0_4px_3px_pink] text-[#FFC0CB]'
+        buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_pink] tw:text-[#FFC0CB]'
     },
 ]
 
@@ -107,7 +107,7 @@ export default function Hero({ onColorChange, className = '' }: Props) {
         roles.map((_role, index) => {
             roleNames.current[index] = SplitText.create(`.role-name-${index}`, {
                 type: 'chars',
-                charsClass: 'role-char opacity-0 blur-md'
+                charsClass: 'role-char tw:opacity-0 tw:blur-md'
             })
         }, []);
 
@@ -196,10 +196,10 @@ export default function Hero({ onColorChange, className = '' }: Props) {
     };
 
 
-    return <div className={twMerge('bg-transparent flex flex-col justify-evenly  text-white', className)} ref={container}>
-        <div className='max-w-none m-auto text-center mt-24 
-        text-[6rem] lg:max-w-[30rem] lg:text-[60px] lg:mb-40 lg:mx-0
-        lg:mt-40 lg:font-bold lg:block lg:min-h-[288px] lg:text-left'>
+    return <div className={twMerge('tw:bg-transparent tw:flex tw:flex-col tw:justify-evenly  tw:text-white', className)} ref={container}>
+        <div className='tw:max-w-none tw:m-auto tw:text-center tw:mt-24 
+        tw:text-[6rem] tw:lg:max-w-[30rem] tw:lg:text-[60px] tw:lg:mb-40 tw:lg:mx-0
+        tw:lg:mt-40 tw:lg:font-bold tw:lg:block tw:lg:min-h-[288px] tw:lg:text-left'>
             <h1 className="header-title">
                 The journey is the reward...
             </h1>
@@ -209,11 +209,11 @@ export default function Hero({ onColorChange, className = '' }: Props) {
             Leonardo Rios
         </span>
 
-        <div className='relative flex gap-4 items-center'>
-            <span className="inline header-software">Software</span>
+        <div className='tw:relative tw:flex tw:gap-4 tw:items-center'>
+            <span className="tw:inline header-software">Software</span>
 
             <button
-                className={twMerge("relative cursor-pointer inline")}
+                className={twMerge("tw:relative tw:cursor-pointer tw:inline")}
                 onClick={onClick}
                 onMouseEnter={onHover}
                 onMouseLeave={() => setHover(false)}
@@ -223,8 +223,8 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                         return <div
                             key={index}
                             className={twMerge(
-                                `flex items-center gap-2 whitespace-nowrap top-0 left-0 role-${index}`,
-                                active === index ? "relative z-10" : "absolute",
+                                `tw:flex tw:items-center tw:gap-2 tw:whitespace-nowrap tw:top-0 tw:left-0 role-${index}`,
+                                active === index ? "tw:relative tw:z-10" : "tw:absolute",
                                 buttonClassname
                             )}
                         >
@@ -235,7 +235,7 @@ export default function Hero({ onColorChange, className = '' }: Props) {
                                 size={30}
                                 colorize={color}
                                 state={iconState}
-                                className={'opacity-0 lordicon'}
+                                className={'tw:opacity-0 lordicon'}
                                 onComplete={() => {
                                     if (active !== index) return;
 

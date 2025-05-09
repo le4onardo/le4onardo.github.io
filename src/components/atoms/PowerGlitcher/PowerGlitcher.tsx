@@ -75,7 +75,7 @@ const GlitcherHOC: React.FC<Props> = ({
         ref.current = node;
         glitch.ref(node);
         // Must be placed after glitch.ref because it changes parent and adds children
-        const glitchElements = node.parentElement!.children
+        const glitchElements = node.parentElement!.children;
 
         // Omitting 0 because is the actual react element displayed on screen
         for (let i = 1; i < glitchElements.length; i++) {

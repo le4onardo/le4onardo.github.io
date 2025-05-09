@@ -25,8 +25,8 @@ const MainLayout: React.FC<Props> = ({ children, classProps }: Props) => {
 
   return (
     <>
-      <div className={`sticky z-10 top-0  border-b-neutral-700 backdrop-blur-sm ${scroll && "border-b-[1px]"}`} ref={ref}>
-        <NavigationBar className=' h-16 w-full mx-auto max-w-[1200px] px-12' />
+      <div className={`tw:sticky tw:z-20 tw:top-0 tw:border-b-neutral-700 tw:backdrop-blur-sm ${scroll && "tw:border-b-[1px]"}`} ref={ref}>
+        <NavigationBar className='tw:h-16 tw:w-full tw:mx-auto tw:max-w-[1200px] tw:px-12' />
       </div >
       <div className={`main-layout ${classProps}`}>
 

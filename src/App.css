@@ -1,10 +1,10 @@
-@import "tailwindcss";
+@import "tailwindcss" prefix(tw);
+
 
 #root {
     color: white;
     font-family: 'Motomangucode', sans-serif;
     font-size: 1rem;
-    overflow-x: hidden;
 }
 
 #clustrmaps-widget-v2 {
@@ -27,6 +27,8 @@ body,
 html {
     margin: 0;
     background-color: black;
+    scroll-behavior: smooth;
+
     /*#10101b;*/
     --background-width: 1400px;
 }

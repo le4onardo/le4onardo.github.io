@@ -8,8 +8,8 @@ interface Props {
 const NavigationBar = ({ className }: Props) => {
 
   return (
-    <div className={twMerge('mt-0 gap-2.5 flex justify-between items-center lg:gap-10', className)}>
-      < Link href='#' className='mr-auto' >
+    <div className={twMerge('tw:mt-0 tw:gap-2.5 tw:flex tw:justify-between tw:items-center tw:lg:gap-10', className)}>
+      < Link href='#' className='tw:mr-auto' >
         <div className="">Home</div>
       </Link >
       <Link href='#about'>
