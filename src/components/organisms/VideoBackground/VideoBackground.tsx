@@ -77,9 +77,9 @@ export const VideoBackground = ({ className }: Props) => {
             loop={true}
             controls={false}
         />
-        <div className='absolute top-0 w-full h-1/5 bg-linear-[to_bottom,rgba(0,0,0,1),rgba(0,0,0,0)]' />
-        <div className='absolute top-0 right-0 h-full w-1/5 bg-linear-[to_left,rgba(0,0,0,1),rgba(0,0,0,0)]' />
-        <div className='absolute bottom-0 w-full h-1/5 bg-linear-[to_top,rgba(0,0,0,1),rgba(0,0,0,0)]' />
-        <div className='absolute top-0 left-0 h-full w-1/5 bg-linear-[to_right,rgba(0,0,0,1),rgba(0,0,0,0)]' />
+        <div className='tw:absolute tw:top-0 tw:w-full tw:h-1/5 tw:bg-linear-[to_bottom,rgba(0,0,0,1),rgba(0,0,0,0)]' />
+        <div className='tw:absolute tw:top-0 tw:right-0 tw:h-full tw:w-1/5 tw:bg-linear-[to_left,rgba(0,0,0,1),rgba(0,0,0,0)]' />
+        <div className='tw:absolute tw:bottom-0 tw:w-full tw:h-1/5 tw:bg-linear-[to_top,rgba(0,0,0,1),rgba(0,0,0,0)]' />
+        <div className='tw:absolute tw:top-0 tw:left-0 tw:h-full tw:w-1/5 tw:bg-linear-[to_right,rgba(0,0,0,1),rgba(0,0,0,0)]' />
     </div>
 }
