@@ -1,6 +1,9 @@
+interface Props {
+    className?: string
+}
 
-export default function Skills() {
-    return <div style={{ height: 900, width: "100%" }}>
+export default function Skills({ className }: Props) {
+    return <div className={className} id="skills">
         SKILLS
     </div>
 }
