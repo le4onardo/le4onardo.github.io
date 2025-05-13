@@ -1,17 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { useEffect, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import gsap from 'gsap';
 
 interface Props {
     className?: string;
     autoPlay?: boolean;
     muted?: boolean;
+    hue?: number;
 }
 
 
-export const VideoBackground = ({ className }: Props) => {
+export const VideoBackground = ({ className, hue }: Props) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const inertiaX = useRef(0);
     const inertiaEpsilon = useRef(0);
     const queue = useRef<number[]>([]);
+
+    useGSAP(() => {
+        gsap.to(videoRef.current, {
+            filter: `hue-rotate(${hue}deg)`,
+            color: '#ffffff',
+            duration: 1,
+        });
+    }, { dependencies: [hue] });
+
 
     useEffect(() => {
         let id = setInterval(() => {
@@ -39,6 +52,8 @@ export const VideoBackground = ({ className }: Props) => {
         return () => clearInterval(id);
     }, []);
 
+
+
     const onMouseDown = (e: React.MouseEvent) => {
         inertiaX.current = e.clientX;
     }
@@ -56,7 +71,7 @@ export const VideoBackground = ({ className }: Props) => {
     const onMouseUp = (e: React.MouseEvent) => {
         inertiaX.current = 0;
     }
-    return <div className={className}
+    return <div className={twMerge('tw:relative', className)}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
