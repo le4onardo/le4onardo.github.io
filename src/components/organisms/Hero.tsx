@@ -8,9 +8,6 @@ import { Player } from '@lordicon/react';
 import { VideoBackground } from "./VideoBackground/VideoBackground";
 
 
-gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(SplitText);
-
 const roles = [
     {
         name: 'Developer',
@@ -88,30 +85,45 @@ export default function Hero({ className = '' }: Props) {
     const { contextSafe } = useGSAP(() => {
         let mainTimeline = gsap.timeline();
         let title = SplitText.create('.header-title', { type: "chars", smartWrap: true })
-        mainTimeline.from(title.chars, {
-            duration: 1,
-            stagger: 0.1,
-            ease: "elastic.out(1,0.5)",
-            filter: "blur(10px)",
-            scale: 3,
-            opacity: 0
+        mainTimeline.fadeIn(title.chars, {
+            from: {
+                scale: 0.5
+            }, to: {
+                // ease: "elastic.out(1,0.5)",
+                ease: "back.out(4)",
+                duration: 1,
+                stagger: 0.15
+            }
         });
 
-        let author = SplitText.create('.header-author', { type: "chars", smartWrap: true })
-        mainTimeline.from(author.chars, {
-            duration: 0.5,
-            stagger: 0.05,
+        let author = SplitText.create('.header-author', { type: "words", smartWrap: true })
+        mainTimeline.fromTo(author.words, {
+            y: 20,
             opacity: 0,
-            filter: 'blur(10px)',
-        }, '+=0.5');
+            filter: 'blur(20px)',
+            scale: 0.8,
+        }, {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            stagger: 0.4,
+            scale: 1,
+            // duration: 1,
+        }, '+=1');
 
-        let software = SplitText.create('.header-software', { type: 'chars', smartWrap: true });
-        mainTimeline.from(software.chars, {
-            duration: 0.5,
-            stagger: 0.05,
+        let software = SplitText.create('.header-software', { type: 'words', smartWrap: true });
+        mainTimeline.fromTo(software.words, {
+            y: 20,
             opacity: 0,
-            filter: 'blur(10px)',
-        }, '+=0.5');
+            filter: 'blur(20px)',
+            scale: 0.8,
+        }, {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration: 0.5,
+            scale: 1,
+        }, '+=1');
 
         roles.map((_role, index) => {
             roleNames.current[index] = SplitText.create(`.role-name-${index}`, {
@@ -120,14 +132,12 @@ export default function Hero({ className = '' }: Props) {
             })
         }, []);
 
-        mainTimeline.to(roleNames.current[active].chars, {
-            opacity: 1,
-            filter: 'blur(0px)',
-            duration: 0.5,
-            color: roles[active].color,
-            scale: 1,
-            stagger: 0.05,
-        }, '-=0.5');
+        mainTimeline.fadeIn(roleNames.current[active].chars, {
+            to: {
+                color: roles[active].color,
+                stagger: 0.05
+            }
+        });
 
         mainTimeline.set(`.role-${active} .lordicon`, {
             opacity: 1,
@@ -143,40 +153,35 @@ export default function Hero({ className = '' }: Props) {
         const role = roles[active]
         const nextRole = roles[nextActive];
         const target = e.target as HTMLElement;
-        console.log('click', target.className)
         const position = target.className.includes('role-char') ?
             [...target.parentElement!.childNodes].findIndex(node => node === e.target) :
             role.name.length;
-
         let tl = gsap.timeline();
 
         tl.to(`.role-${active} .role-char, .role-${active} .lordicon`, {
             opacity: 0,
             filter: 'blur(10px)',
             scale: 5,
-            duration: 0.3,
             color: '#000000',
             overwrite: true,
             stagger: {
                 from: position,
                 each: 0.05
-            },
+            }
         });
         tl.set(`.role-${active} .role-char, .role-${active} .lordicon`, {
             scale: 1
-        })
+        });
         tl.to(`.role-${nextActive} .role-char`, {
-            opacity: 1,
-            duration: 0.3,
             filter: 'blur(0px)',
             scale: 1,
+            opacity: 1,
             color: nextRole.color,
             stagger: {
                 from: Math.min(position, nextRole.name.length),
                 each: 0.05
-            },
-        }, '<+=0.05');
-
+            }
+        }, '<-=1');
         tl.set(`.role-${nextActive} .lordicon`, {
             opacity: 1,
             filter: 'blur(0px)',
@@ -187,13 +192,11 @@ export default function Hero({ className = '' }: Props) {
             }
         });
 
-
         const rotationCount = Math.floor(videoHue / 360);
         // last hue degree is minor than previous, this ensures videoHue is always larger than previous
         const degreeBase = nextActive === roles.length - 1 ?
             (rotationCount + 1) * 360 :
             rotationCount * 360;
-
         setVideoHue(degreeBase + nextRole.videoHue);
         setActive(nextActive);
     });
@@ -203,15 +206,14 @@ export default function Hero({ className = '' }: Props) {
         const playerRef = iconsPlayers.current[active];
 
         if (!playerRef?.isPlaying && iconState === roles[active].iconData.hover) {
-            // console.log('hover play!');
             playerRef?.play();
         }
     };
 
 
-    return <div className={twMerge('tw:bg-transparent tw:flex tw:flex-col tw:justify-evenlytw:text-white', className)} ref={container}>
+    return <div className={twMerge('tw:flex tw:flex-col tw:justify-evenlytw:text-white', className)} ref={container}>
         <div className={`tw:absolute tw:w-fit tw:h-full tw:right-0`}>
-            <VideoBackground className="tw:top-[150px] tw:cursor-pointer tw:sticky hero-video" hue={videoHue} />
+            <VideoBackground className="tw:top-[80px] tw:cursor-pointer hero-video" hue={videoHue} />
         </div>
         <div className='tw:max-w-none tw:m-auto tw:text-center tw:mt-24 
         tw:text-[6rem] tw:lg:max-w-[30rem] tw:lg:text-[60px] tw:lg:mb-40 tw:lg:mx-0
@@ -227,7 +229,6 @@ export default function Hero({ className = '' }: Props) {
 
         <div className='tw:relative tw:flex tw:gap-4 tw:items-center'>
             <span className="tw:inline header-software">Software</span>
-
             <button
                 className={twMerge("tw:relative tw:cursor-pointer tw:inline")}
                 onClick={onClick}
