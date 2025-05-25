@@ -85,45 +85,32 @@ export default function Hero({ className = '' }: Props) {
     const { contextSafe } = useGSAP(() => {
         let mainTimeline = gsap.timeline();
         let title = SplitText.create('.header-title', { type: "chars", smartWrap: true })
-        mainTimeline.fadeIn(title.chars, {
-            from: {
-                scale: 0.5
-            }, to: {
-                // ease: "elastic.out(1,0.5)",
-                ease: "back.out(4)",
-                duration: 1,
-                stagger: 0.15
-            }
+        mainTimeline.from(title.chars, {
+            opacity: 0,
+            filter: 'blur(10px)',
+            y: 50,
+            ease: 'back',
+            scale: 0.8,
+            stagger: 0.1,
         });
 
         let author = SplitText.create('.header-author', { type: "words", smartWrap: true })
-        mainTimeline.fromTo(author.words, {
-            y: 20,
+        mainTimeline.from(author.words, {
             opacity: 0,
-            filter: 'blur(20px)',
+            filter: 'blur(10px)',
+            y: 10,
             scale: 0.8,
-        }, {
-            y: 0,
-            opacity: 1,
-            filter: 'blur(0px)',
-            stagger: 0.4,
-            scale: 1,
-            // duration: 1,
+            stagger: 0.3,
+
         }, '+=1');
 
-        let software = SplitText.create('.header-software', { type: 'words', smartWrap: true });
-        mainTimeline.fromTo(software.words, {
-            y: 20,
+        mainTimeline.from('.header-software', {
             opacity: 0,
-            filter: 'blur(20px)',
+            filter: 'blur(10px)',
+            y: 10,
             scale: 0.8,
-        }, {
-            y: 0,
-            opacity: 1,
-            filter: 'blur(0px)',
-            duration: 0.5,
-            scale: 1,
-        }, '+=1');
+            duration: 0.5
+        }, '+=0.5');
 
         roles.map((_role, index) => {
             roleNames.current[index] = SplitText.create(`.role-name-${index}`, {
@@ -132,11 +119,10 @@ export default function Hero({ className = '' }: Props) {
             })
         }, []);
 
-        mainTimeline.fadeIn(roleNames.current[active].chars, {
-            to: {
-                color: roles[active].color,
-                stagger: 0.05
-            }
+        mainTimeline.to(roleNames.current[active].chars, {
+            filter: 'blur(0px)',
+            opacity: 1,
+            stagger: 0.05,
         });
 
         mainTimeline.set(`.role-${active} .lordicon`, {
@@ -223,12 +209,12 @@ export default function Hero({ className = '' }: Props) {
             </h1>
         </div>
 
-        <span className='header-author'>
+        <span className='header-author tw:w-fit'>
             Leonardo Rios
         </span>
 
-        <div className='tw:relative tw:flex tw:gap-4 tw:items-center'>
-            <span className="tw:inline header-software">Software</span>
+        <div className='tw:relative tw:flex tw:gap-4 tw:items-center tw:w-fit'>
+            <span className="tw:inline  header-software">Software</span>
             <button
                 className={twMerge("tw:relative tw:cursor-pointer tw:inline")}
                 onClick={onClick}
