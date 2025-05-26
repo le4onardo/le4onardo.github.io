@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 
@@ -8,10 +8,8 @@ export default function useSplitText(target: gsap.DOMTarget, vars: SplitText.Var
     useGSAP(() => {
         if (target) {
             splitTextObj.current = SplitText.create(target, vars);
-            console.log('text splited', target, vars)
         }
         return () => {
-            console.log('split reverted')
             splitTextObj.current?.revert()
         };
     }, [target]);

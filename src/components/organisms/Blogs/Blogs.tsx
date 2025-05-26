@@ -1,8 +1,12 @@
+import { twMerge } from "tailwind-merge";
 import { cardsData } from "../../../utils/data"
 import PresentationCard from "../../molecules/PresentationCard/PresentationCard"
 
-export default function Blogs() {
-    return <div className='tw:max-w-4/5 tw:flex tw:flex-col tw:gap-10' id="blogs">
+interface Props {
+    className?: string;
+}
+export default function Blogs({ className }: Props) {
+    return <div className={twMerge('tw:max-w-4/5 tw:flex tw:flex-col tw:gap-10', className)} id="blogs">
         {
             cardsData.map(({ title, description, writeDate, readTime }) =>
                 <PresentationCard

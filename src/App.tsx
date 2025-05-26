@@ -3,6 +3,7 @@ import Home from './pages/Home/Home';
 import TestBlog from './pages/blogs/TestBlog/TestBlog.mdx';
 import './App.css';
 import { useEffect } from 'react';
+import './utils/gsap';
 
 const App = () => {
   useEffect(() => {

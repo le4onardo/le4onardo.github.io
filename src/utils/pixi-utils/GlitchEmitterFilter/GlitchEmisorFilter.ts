@@ -1,4 +1,4 @@
-import { GlitchFilter, GlitchFilterOptions } from '@pixi/filter-glitch';
+import { GlitchFilter, GlitchFilterOptions } from 'pixi-filters';
 import Repeater from '../../Repeater';
 
 export default class GlitchEmisorFilter extends GlitchFilter {
@@ -25,18 +25,18 @@ export default class GlitchEmisorFilter extends GlitchFilter {
 
   private getRandomOffset(intensity = 1) {
     const range =
-      this.rangeOptions.offset || this.uniforms.dimensions[0] / 2;
+      this.rangeOptions.offset || this.uniforms.uDimensions[0] / 2;
     return Math.round(range * intensity);
   }
 
   private getRandomRed(intensity = 1) {
     const rangeX = this.rangeOptions.red
       ? (this.rangeOptions.red as number[])[0]
-      : this.uniforms.dimensions[0] / 2;
+      : this.uniforms.uDimensions[0] / 2;
 
     const rangeY = this.rangeOptions.red
       ? (this.rangeOptions.red as number[])[1]
-      : this.uniforms.dimensions[1] / 4;
+      : this.uniforms.uDimensions[1] / 4;
 
     return [
       Math.round(
@@ -51,11 +51,11 @@ export default class GlitchEmisorFilter extends GlitchFilter {
   private getRandomGreen(intensity = 1) {
     const rangeX = this.rangeOptions.green
       ? (this.rangeOptions.green as number[])[0]
-      : this.uniforms.dimensions[0] / 2;
+      : this.uniforms.uDimensions[0] / 2;
 
     const rangeY = this.rangeOptions.green
       ? (this.rangeOptions.green as number[])[1]
-      : this.uniforms.dimensions[1] / 4;
+      : this.uniforms.uDimensions[1] / 4;
 
     return [
       Math.round(
@@ -70,11 +70,11 @@ export default class GlitchEmisorFilter extends GlitchFilter {
   private getRandomBlue(intensity = 1) {
     const rangeX = this.rangeOptions.blue
       ? (this.rangeOptions.blue as number[])[0]
-      : this.uniforms.dimensions[0] / 2;
+      : this.uniforms.uDimensions[0] / 2;
 
     const rangeY = this.rangeOptions.blue
       ? (this.rangeOptions.blue as number[])[1]
-      : this.uniforms.dimensions[1] / 4;
+      : this.uniforms.uDimensions[1] / 4;
     return [
       Math.round(
         (rangeX * Math.random() - rangeX / 2) * intensity
