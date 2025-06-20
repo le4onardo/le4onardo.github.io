@@ -1,243 +1,459 @@
 import { useEffect } from "react";
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
+import * as THREE from "three/webgpu";
+import { atan, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Timer } from 'three/addons/misc/Timer.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-// import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-import { WebGLRenderer } from "three";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
-import { EffectPass, SelectiveBloomEffect, EffectComposer, RenderPass } from "postprocessing";
-import GUI from 'lil-gui'; 
-import { render } from "react-dom";
 
-// https://learnopengl.com/Getting-started/Coordinate-Systems
-const vertexShader = `
-			varying vec2 vUv;
-			void main() {
-				vUv = uv;
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-			}
-`;
+/**
+ * 
+ * Source from https://github.com/mrdoob/three.js/blob/master/examples/webgpu_tsl_vfx_linkedparticles.html
+ * 
+ */
+interface Props {
+    className: string;
+}
 
-const fragmentShader = `
-            uniform sampler2D baseTexture;
-			uniform sampler2D bloomTexture;
-
-			varying vec2 vUv;
-
-			void main() {
-				gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
-			}
-`;
-
-export function ThreeCanvas () {
+export function ThreeCanvas ({ className }: Props) {
     useEffect(() => {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            30, 
-            window.innerWidth / window.innerHeight,
-            0.001,
-            1000
-        );
-        camera.position.z = 30;
-        const canvas = document.getElementById('myThreeJsCanvas') as HTMLCanvasElement;
-        const renderer = new WebGLRenderer({
-            canvas, 
-            // antialias: false,
-            // powerPreference: "high-performance",
-	        // stencil: false,
-	        //depth: false
-        });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.shadowMap.enabled = true;
-        
-        // renderer.toneMapping = THREE.ReinhardToneMapping;
-        
-        /*
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        ambientLight.castShadow = true;
-        scene.add(ambientLight);
+			let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGPURenderer,
+            postProcessing: THREE.PostProcessing, controls: OrbitControls, timer: Timer, light: THREE.PointLight;
 
-        const spotLight = new THREE.SpotLight(0xffffff, 1);
-        spotLight.castShadow = true;// 
-        spotLight.position.set(0, 64, 32);
-        scene.add(spotLight);
-        */
-        
+			let updateParticles: THREE.ComputeNode, spawnParticles: THREE.ComputeNode; // TSL compute nodes
+			let getInstanceColor: THREE.TSL.ShaderNodeFn<[any]>; // TSL function
+            let gui: GUI;
 
-        const sprite = new THREE.TextureLoader().load(
-            // "https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/images/sky_blue-circle-512.png",
-            "https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/images/circle-512.png"
-            // 'https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/images/disc.png'
-            // "https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/images/metal_ball.jpeg"
-        );
+			const screenPointer = new THREE.Vector2();
+			const scenePointer = new THREE.Vector3();
+			const raycastPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
+			const raycaster = new THREE.Raycaster();
 
-        const gltfLoader = new GLTFLoader();
-        gltfLoader.load('https://le4onardo-website-assets.s3.us-east-1.amazonaws.com/3d_models/scene.gltf', (gltfScene) => {
-            scene.add(gltfScene.scene);
-            const pointsObj =  gltfScene.scene.getObjectByName("Object_2") as THREE.Points;
-            
-            
-            const pointsGeometry = pointsObj!.geometry;
-            const center = new THREE.Vector3(
-                (pointsGeometry.boundingBox!.max.x + pointsGeometry.boundingBox!.min.x)/2, 
-                (pointsGeometry.boundingBox!.max.y + pointsGeometry.boundingBox!.min.y)/2,
-                (pointsGeometry.boundingBox!.max.z + pointsGeometry.boundingBox!.min.z)/2
-            );
-            
+			const nbParticles = Math.pow( 2, 13 );
 
-            const colors = [
-                //white:
-                 new THREE.Color(255,254,250).toArray(),
-                //softSkyBlue: 
-                new THREE.Color(238,239,255).toArray(),
-                //skyBlue:
-                 new THREE.Color(196,214,255).toArray(),
-                //softOrange:
-                 // new THREE.Color(251,201,158).toArray(),
-                //orange:
-                  new THREE.Color(248,139,20).toArray(),
-                //heavyOrange:
-                 // new THREE.Color(246,96,1).toArray()
-            ]
-            const positionAttr = pointsGeometry.getAttribute('position');
-            const colorAttr = pointsGeometry.getAttribute('color');
-            const distances = [];
-            let maxDistance = 0;
-            
-            
-            for (let i=0; i < positionAttr.count; i++) {
-                const distanceFromCenter = center.distanceTo(
-                    new THREE.Vector3(positionAttr.array[i*3], positionAttr.array[i*3 + 1], positionAttr.array[i*3 + 2])
-                );
+			const timeScale = uniform( 1.0 );
+			const particleLifetime = uniform( 0.5 );
+			const particleSize = uniform( 1.0 );
+			const linksWidth = uniform( 0.005 );
 
-                distances.push(distanceFromCenter);
-                maxDistance = Math.max(maxDistance, distanceFromCenter + 1);
-            }
-            distances.forEach((distance, i) => {
-                const normDistance = 1 - (distance/maxDistance);
-                const pivot = Math.floor(normDistance * colors.length);
-                const random = 1 - Math.pow(Math.random(), 1.5);
+			const colorOffset = uniform( 0.0 );
+			const colorVariance = uniform( 2.0 );
+			const colorRotationSpeed = uniform( 1.0 );
 
-                const selectedColor = colors[Math.ceil(pivot*random)];
-                
-                colorAttr.array[i*4] = selectedColor[0] / 255;
-                colorAttr.array[i*4 + 1] = selectedColor[1] / 255;
-                colorAttr.array[i*4 + 2] = selectedColor[2] / 255;
-                colorAttr.array[i*4 + 3] = 1;
-            });
-            colorAttr.needsUpdate=true;
+			const spawnIndex = uniform( 0 );
+			const nbToSpawn = uniform( 5 );
+			const spawnPosition = uniform( vec3( 0.0 ) );
+			const previousSpawnPosition = uniform( vec3( 0.0 ) );
 
-            const pointMaterial = pointsObj!.material as THREE.PointsMaterial;
-            console.log(pointsObj, positionAttr.count);
-            
-            pointMaterial.size = 0.002
-            pointMaterial.sizeAttenuation = true;
-            pointMaterial.transparent = true;
-            pointMaterial.depthWrite = false;
-            pointMaterial.map = sprite;
-            // pointMaterial.vertexColors = true;
-            pointMaterial.opacity = 1;
-            
+			const turbFrequency = uniform( 0.5 );
+			const turbAmplitude = uniform( 0.5 );
+			const turbOctaves = uniform( 2 );
+			const turbLacunarity = uniform( 2.0 );
+			const turbGain = uniform( 0.5 );
+			const turbFriction = uniform( 0.01 );
 
-            const glthtBox = new THREE.Box3().setFromObject(gltfScene.scene);
-            const xSize = glthtBox.max.x - glthtBox.min.x;
-            const ySize = glthtBox.max.y - glthtBox.min.y;
-            const zSize = glthtBox.max.z - glthtBox.min.z;
-        
-            console.log('GLTF position', scene.getWorldPosition(gltfScene.scene.position), xSize, ySize, zSize);
-            animate();        
-        });
-        const light = new THREE.PointLight(0xffffff, 50, 0, 0.5);
-        light.position.set(10, 10, 10);
-        light.castShadow=true
-        scene.add(light);
-        const lightBox = new THREE.Box3().setFromObject(light);
-        const xSize = lightBox.max.x - lightBox.min.x
-        const ySize = lightBox.max.y - lightBox.min.y
-        const zSize = lightBox.max.z - lightBox.min.z
-        console.log('Point light position', scene.getWorldPosition(light.position), xSize, ySize, zSize);
+			init();
 
-        const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
-        const material = new THREE.MeshStandardMaterial( {
-            color: 0x554488, alphaTest: 0, visible: true, transparent: false,
-            roughness:1, metalness:0
-        } ); 
-        const cube = new THREE.Mesh( geometry, material ); 
-        cube.position.set(5,5,5)
-        cube.castShadow = true;
-        cube.receiveShadow = true;
-        scene.add( cube );
+			function init() {
 
-        const stats = new Stats();
-        document.body.appendChild(stats.dom);
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 200 );
+				camera.position.set( 0, 0, 10 );
+
+				scene = new THREE.Scene();
+
+				timer = new Timer();
+				timer.connect( document );
+
+				// renderer
+                const canvas = document.querySelector('#myThreeJsCanvas') as HTMLCanvasElement;
+				renderer = new THREE.WebGPURenderer( { antialias: true, canvas } );
+				renderer.setClearColor( 0x14171a );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				
+
+				// TSL function
+				// current color from index
+				getInstanceColor = /*#__PURE__*/ Fn( ( [ i ]: any[] ) => {
+					return hue( color( 0x0000ff ), colorOffset.add( mx_fractal_noise_float( i.toFloat().mul( .1 ), 2, 2.0, 0.5, colorVariance ) ) );
+				} );
+
+				// Particles
+				// storage buffers
+				const particlePositions = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
+				const particleVelocities = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
+
+				// init particles buffers
+				renderer.computeAsync( /*#__PURE__*/ Fn( () => {
+
+					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
+					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
+
+				} )().compute( nbParticles ) );
+
+				// particles output
+				const particleQuadSize = 0.05;
+				const particleGeom = new THREE.PlaneGeometry( particleQuadSize, particleQuadSize );
+
+				const particleMaterial = new THREE.SpriteNodeMaterial();
+				particleMaterial.blending = THREE.AdditiveBlending;
+				particleMaterial.depthWrite = false;
+				particleMaterial.positionNode = particlePositions.toAttribute();
+				particleMaterial.scaleNode = vec2( particleSize );
+				particleMaterial.rotationNode = atan( particleVelocities.toAttribute().y, particleVelocities.toAttribute().x );
+
+				particleMaterial.colorNode = /*#__PURE__*/ Fn( () => {
+
+					const life = particlePositions.toAttribute().w;
+					const modLife = pcurve( life.oneMinus(), 8.0, 1.0 );
+					const pulse = pcurve(
+						sin( hash( instanceIndex ).mul( PI2 ).add( time.mul( 0.5 ).mul( PI2 ) ) ).mul( 0.5 ).add( 0.5 ),
+						0.25,
+						0.25
+					).mul( 10.0 ).add( 1.0 );
+
+					return getInstanceColor( instanceIndex ).mul( pulse.mul( modLife ) );
+
+				} )();
+
+				particleMaterial.opacityNode = /*#__PURE__*/ Fn( () => {
+
+					const circle = uv().xy.sub( 0.5 ).length().step( 0.5 );
+					const life = particlePositions.toAttribute().w;
+
+					return circle.mul( life );
+
+				} )();
+
+				const particleMesh = new THREE.InstancedMesh( particleGeom, particleMaterial, nbParticles );
+				particleMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				particleMesh.frustumCulled = false;
+
+				scene.add( particleMesh );
+
+				// Links between particles
+				// first, we define the indices for the links, 2 quads per particle, the indexation is fixed
+				const linksIndices = [];
+				for ( let i = 0; i < nbParticles; i ++ ) {
+
+					const baseIndex = i * 8;
+					for ( let j = 0; j < 2; j ++ ) {
+
+						const offset = baseIndex + j * 4;
+						linksIndices.push( offset, offset + 1, offset + 2, offset, offset + 2, offset + 3 );
+
+					}
+
+				}
+
+				// storage buffers attributes for the links
+				const nbVertices = nbParticles * 8;
+				const linksVerticesSBA = new THREE.StorageBufferAttribute( nbVertices, 4 );
+				const linksColorsSBA = new THREE.StorageBufferAttribute( nbVertices, 4 );
+
+				// links output
+				const linksGeom = new THREE.BufferGeometry();
+				linksGeom.setAttribute( 'position', linksVerticesSBA );
+				linksGeom.setAttribute( 'color', linksColorsSBA );
+				linksGeom.setIndex( linksIndices );
+
+				const linksMaterial = new THREE.MeshBasicNodeMaterial();
+				linksMaterial.vertexColors = true;
+				linksMaterial.side = THREE.DoubleSide;
+				linksMaterial.transparent = true;
+				linksMaterial.depthWrite = false;
+				linksMaterial.depthTest = false;
+				linksMaterial.blending = THREE.AdditiveBlending;
+				linksMaterial.opacityNode = storage( linksColorsSBA, 'vec4', linksColorsSBA.count ).toAttribute().w;
+
+				const linksMesh = new THREE.Mesh( linksGeom, linksMaterial );
+				linksMesh.frustumCulled = false;
+				scene.add( linksMesh );
+
+				// compute nodes
+				updateParticles = /*#__PURE__*/ Fn( () => {
+
+					const position = particlePositions.element( instanceIndex ).xyz;
+					const life = particlePositions.element( instanceIndex ).w;
+					const velocity = particleVelocities.element( instanceIndex ).xyz;
+					const dt = deltaTime.mul( 0.1 ).mul( timeScale );
+
+					If( life.greaterThan( 0.0 ), () => {
+
+						// first we update the particles positions and velocities
+						// velocity comes from a turbulence field, and is multiplied by the particle lifetime so that it slows down over time
+						const localVel = mx_fractal_noise_vec3( position.mul( turbFrequency ), turbOctaves, turbLacunarity, turbGain, turbAmplitude ).mul( life.add( .01 ) );
+						velocity.addAssign( localVel );
+						velocity.mulAssign( turbFriction.oneMinus() );
+						position.addAssign( velocity.mul( dt ) );
+
+						// then we decrease the lifetime
+						life.subAssign( dt.mul( particleLifetime.reciprocal() ) );
+
+						// then we find the two closest particles and set a quad to each of them
+						const closestDist1 = float( 10000.0 ).toVar();
+						const closestPos1 = vec3( 0.0 ).toVar();
+						const closestLife1 = float( 0.0 ).toVar();
+						const closestDist2 = float( 10000.0 ).toVar();
+						const closestPos2 = vec3( 0.0 ).toVar();
+						const closestLife2 = float( 0.0 ).toVar();
+
+						Loop( nbParticles, ( { i } ) => {
+
+							const otherPart = particlePositions.element( i );
+                            // @ts-ignore
+							If( i.notEqual( instanceIndex ).and( otherPart.w.greaterThan( 0.0 ) ), () => { // if not self and other particle is alive
+
+								const otherPosition = otherPart.xyz;
+								const dist = position.sub( otherPosition ).lengthSq();
+								const moreThanZero = dist.greaterThan( 0.0 );
+
+								If( dist.lessThan( closestDist1 ).and( moreThanZero ), () => {
+
+									closestDist1.assign( dist );
+									closestPos1.assign( otherPosition.xyz );
+									closestLife1.assign( otherPart.w );
+
+								} ).ElseIf( dist.lessThan( closestDist2 ).and( moreThanZero ), () => {
+
+									closestDist2.assign( dist );
+									closestPos2.assign( otherPosition.xyz );
+									closestLife2.assign( otherPart.w );
+
+								} );
+
+							} );
+
+						} );
+
+						// then we update the links correspondingly
+						const linksPositions = storage( linksVerticesSBA, 'vec4', linksVerticesSBA.count );
+						const linksColors = storage( linksColorsSBA, 'vec4', linksColorsSBA.count );
+						const firstLinkIndex = instanceIndex.mul( 8 );
+						const secondLinkIndex = firstLinkIndex.add( 4 );
+
+						// positions link 1
+						linksPositions.element( firstLinkIndex ).xyz.assign( position );
+						linksPositions.element( firstLinkIndex ).y.addAssign( linksWidth );
+						linksPositions.element( firstLinkIndex.add( 1 ) ).xyz.assign( position );
+						linksPositions.element( firstLinkIndex.add( 1 ) ).y.addAssign( linksWidth.negate() );
+						linksPositions.element( firstLinkIndex.add( 2 ) ).xyz.assign( closestPos1 );
+						linksPositions.element( firstLinkIndex.add( 2 ) ).y.addAssign( linksWidth.negate() );
+						linksPositions.element( firstLinkIndex.add( 3 ) ).xyz.assign( closestPos1 );
+						linksPositions.element( firstLinkIndex.add( 3 ) ).y.addAssign( linksWidth );
+
+						// positions link 2
+						linksPositions.element( secondLinkIndex ).xyz.assign( position );
+						linksPositions.element( secondLinkIndex ).y.addAssign( linksWidth );
+						linksPositions.element( secondLinkIndex.add( 1 ) ).xyz.assign( position );
+						linksPositions.element( secondLinkIndex.add( 1 ) ).y.addAssign( linksWidth.negate() );
+						linksPositions.element( secondLinkIndex.add( 2 ) ).xyz.assign( closestPos2 );
+						linksPositions.element( secondLinkIndex.add( 2 ) ).y.addAssign( linksWidth.negate() );
+						linksPositions.element( secondLinkIndex.add( 3 ) ).xyz.assign( closestPos2 );
+						linksPositions.element( secondLinkIndex.add( 3 ) ).y.addAssign( linksWidth );
+
+						// colors are the same for all vertices of both quads
+						const linkColor = getInstanceColor( instanceIndex );
+                        console.log('linkColor', linkColor);
+						// store the minimum lifetime of the closest particles in the w component of colors
+						const l1 = max( 0.0, min( closestLife1, life ) ).pow( 0.8 ); // pow is here to apply a slight curve to the opacity
+						const l2 = max( 0.0, min( closestLife2, life ) ).pow( 0.8 );
+
+						Loop( 4, ( { i } ) => {
+
+							linksColors.element( firstLinkIndex.add( i ) ).xyz.assign( linkColor );
+							linksColors.element( firstLinkIndex.add( i ) ).w.assign( l1 );
+							linksColors.element( secondLinkIndex.add( i ) ).xyz.assign( linkColor );
+							linksColors.element( secondLinkIndex.add( i ) ).w.assign( l2 );
+
+						} );
+
+					} );
+
+				} )().compute( nbParticles );
+
+				spawnParticles = /*#__PURE__*/ Fn( () => {
+
+					const particleIndex = spawnIndex.add( instanceIndex ).mod( nbParticles ).toInt();
+					const position = particlePositions.element( particleIndex ).xyz;
+					const life = particlePositions.element( particleIndex ).w;
+					const velocity = particleVelocities.element( particleIndex ).xyz;
+
+					life.assign( 1.0 ); // sets it alive
+
+					// random spherical direction
+					const rRange = float( 0.01 );
+					const rTheta = hash( particleIndex ).mul( PI2 );
+					const rPhi = hash( particleIndex.add( 1 ) ).mul( PI );
+					const rx = sin( rTheta ).mul( cos( rPhi ) );
+					const ry = sin( rTheta ).mul( sin( rPhi ) );
+					const rz = cos( rTheta );
+					const rDir = vec3( rx, ry, rz );
+
+					// position is interpolated between the previous cursor position and the current one over the number of particles spawned
+					const pos = mix( previousSpawnPosition, spawnPosition, instanceIndex.toFloat().div( nbToSpawn.sub( 1 ).toFloat() ).clamp() );
+					position.assign( pos.add( rDir.mul( rRange ) ) );
+
+					// start in that direction
+					velocity.assign( rDir.mul( 5.0 ) );
+
+				} )().compute( nbToSpawn.value );
 
 
-        const composer = new EffectComposer(renderer);
-        const renderPass = new RenderPass(scene, camera);
-        const selectiveBloom = new SelectiveBloomEffect(scene, camera, {   
-            intensity: 2,
-            luminanceThreshold: 0.5,
-            // luminanceSmoothing: 1,
-            levels: 10,
-            // mipmapBlur: true
-            // luminanceMaterial: new THREE.MeshBasicMaterial({ color: 0x000000 }),
-            // lights: [] 
-        });
-        const bloomPass = new EffectPass(camera, selectiveBloom);
-        
-        composer.addPass(renderPass);
-        composer.addPass(bloomPass);
+				// background , an inverted icosahedron
+				const backgroundGeom = new THREE.IcosahedronGeometry( 100, 5 ).applyMatrix4( new THREE.Matrix4().makeScale( - 1, 1, 1 ) );
+				const backgroundMaterial = new THREE.MeshStandardNodeMaterial();
+				backgroundMaterial.roughness = 0.4;
+				backgroundMaterial.metalness = 0.9;
+				backgroundMaterial.flatShading = true;
+				backgroundMaterial.colorNode = color( 0x0 );
 
+				const backgroundMesh = new THREE.Mesh( backgroundGeom, backgroundMaterial );
+				scene.add( backgroundMesh );
 
+				// light for the background
+				light = new THREE.PointLight( 0xffffff, 3000 );
+				scene.add( light );
 
-        /*
-        requestAnimationFrame(function render() {
-	        requestAnimationFrame(render);
-	        composer.render();    
-        });
-        */
+				// post processing
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        // controls.target.set(0.5, 0.5, 0);
-        // controls.maxPolarAngle = 1;
-        // controls.minPolarAngle = 1;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
+				postProcessing = new THREE.PostProcessing( renderer );
 
-        const animate = () => {
-            // boxMesh.rotation.x += 0.01;
-            // boxMesh.rotation.y += 0.01;
-            controls.update();
-            requestAnimationFrame(animate)
-            composer.render();
-        }
-        animate();
-        
-        // gui for bloom
-        const gui = new GUI();
-        
-        // selectiveBloom.luminanceThreshold
-        gui.add(selectiveBloom, 'intensity', 0, 100, 2).name('Bloom Intensity');
-        // gui.add(selectiveBloom, 'radius', 0, 1, 0.01).name('radius');
-        // gui.add(selectiveBloom, 'luminanceSmoothing', 0, 1, 0.01).name('Luminance Smoothing');   
-        
+				const scenePass = pass( scene, camera );
+				const scenePassColor = scenePass.getTextureNode( 'output' );
 
-        gui.add(light.position, 'x', -100, 100, 1).name('Light X');
-        gui.add(light.position, 'y', -100, 100, 1).name('Light Y');
-        gui.add(light.position, 'z', -100, 100, 1).name('Light Z');
-        gui.add(light, 'visible', 1).name('Visible');
-        
-        
+				const bloomPass = bloom( scenePassColor, 0.75, 0.1, 0.5 );
 
+				postProcessing.outputNode = scenePassColor.add( bloomPass );
 
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableDamping = true;
+				controls.autoRotate = true;
+				controls.maxDistance = 75;
+				window.addEventListener( 'resize', onWindowResize );
+
+				// pointer handling
+
+				window.addEventListener( 'pointermove', onPointerMove );
+
+				// GUI
+
+				gui = new GUI();
+
+				gui.add( controls, 'autoRotate' ).name( 'Auto Rotate' );
+				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );
+
+				const partFolder = gui.addFolder( 'Particles' );
+				partFolder.add( timeScale, 'value', 0.0, 4.0, 0.01 ).name( 'timeScale' );
+				partFolder.add( nbToSpawn, 'value', 1, 100, 1 ).name( 'Spawn rate' );
+				partFolder.add( particleSize, 'value', 0.01, 3.0, 0.01 ).name( 'Size' );
+				partFolder.add( particleLifetime, 'value', 0.01, 2.0, 0.01 ).name( 'Lifetime' );
+				partFolder.add( linksWidth, 'value', 0.001, 0.1, 0.001 ).name( 'Links width' );
+				partFolder.add( colorVariance, 'value', 0.0, 10.0, 0.01 ).name( 'Color variance' );
+				partFolder.add( colorRotationSpeed, 'value', 0.0, 5.0, 0.01 ).name( 'Color rotation speed' );
+
+				const turbFolder = gui.addFolder( 'Turbulence' );
+				turbFolder.add( turbFriction, 'value', 0.0, 0.3, 0.01 ).name( 'Friction' );
+				turbFolder.add( turbFrequency, 'value', 0.0, 1.0, 0.01 ).name( 'Frequency' );
+				turbFolder.add( turbAmplitude, 'value', 0.0, 10.0, 0.01 ).name( 'Amplitude' );
+				turbFolder.add( turbOctaves, 'value', 1, 9, 1 ).name( 'Octaves' );
+				turbFolder.add( turbLacunarity, 'value', 1.0, 5.0, 0.01 ).name( 'Lacunarity' );
+				turbFolder.add( turbGain, 'value', 0.0, 1.0, 0.01 ).name( 'Gain' );
+
+				const bloomFolder = gui.addFolder( 'bloom' );
+				bloomFolder.add( bloomPass.threshold, 'value', 0, 2.0, 0.01 ).name( 'Threshold' );
+				bloomFolder.add( bloomPass.strength, 'value', 0, 10, 0.01 ).name( 'Strength' );
+				bloomFolder.add( bloomPass.radius, 'value', 0, 1, 0.01 ).name( 'Radius' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onPointerMove(e: PointerEvent) {
+
+				screenPointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+				screenPointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+			}
+
+			function updatePointer() {
+
+				raycaster.setFromCamera( screenPointer, camera );
+				raycaster.ray.intersectPlane( raycastPlane, scenePointer );
+
+			}
+
+			function animate() {
+
+				timer.update();
+
+				// compute particles
+				renderer.compute( updateParticles );
+				renderer.compute( spawnParticles );
+
+				// update particle index for next spawn
+				spawnIndex.value = ( spawnIndex.value + nbToSpawn.value ) % nbParticles;
+
+				// update raycast plane to face camera
+				raycastPlane.normal.applyEuler( camera.rotation );
+				updatePointer();
+
+				// lerping spawn position
+                // @ts-ignore
+				previousSpawnPosition.value.copy( spawnPosition.value );
+                // @ts-ignore
+				spawnPosition.value.lerp( scenePointer, 0.1 );
+
+				// rotating colors
+				colorOffset.value += timer.getDelta() * colorRotationSpeed.value * timeScale.value;
+                console.log(colorOffset);
+				const elapsedTime = timer.getElapsed();
+				light.position.set(
+					Math.sin( elapsedTime * 0.5 ) * 30,
+					Math.cos( elapsedTime * 0.3 ) * 30,
+					Math.sin( elapsedTime * 0.2 ) * 30,
+				);
+
+				controls.update();
+
+				postProcessing.render();
+
+			}
+
+            return () => {
+				try {
+					// console.log('calling renderer', stats.dom);
+					// container?.removeChild(stats.dom);
+					// stats.end();
+					gui?.destroy();
+					renderer?.dispose();
+				} catch(e){
+					// 
+				}
+			}
     }, []);
 
 
-    return <canvas id="myThreeJsCanvas" />
+    return <canvas id="myThreeJsCanvas" className={className}/>
 }
