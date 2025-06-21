@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three/webgpu";
 import { atan, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
@@ -15,9 +15,13 @@ import WebGPU from 'three/addons/capabilities/WebGPU.js';
  */
 interface Props {
     className: string;
+	selColorOffset: number;
 }
 
-export function ThreeCanvas ({ className }: Props) {
+export function ThreeCanvas ({ className, selColorOffset }: Props) {
+	const colorOffsetRef = useRef(selColorOffset);
+	colorOffsetRef.current=selColorOffset;
+
     useEffect(() => {
 			let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGPURenderer,
             postProcessing: THREE.PostProcessing, controls: OrbitControls, timer: Timer, light: THREE.PointLight;
@@ -39,7 +43,7 @@ export function ThreeCanvas ({ className }: Props) {
 			const linksWidth = uniform( 0.005 );
 
 			const colorOffset = uniform( 0.0 );
-			const colorVariance = uniform( 2.0 );
+			const colorVariance = uniform( 0.5 );
 			const colorRotationSpeed = uniform( 1.0 );
 
 			const spawnIndex = uniform( 0 );
@@ -334,7 +338,7 @@ export function ThreeCanvas ({ className }: Props) {
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 
-				const bloomPass = bloom( scenePassColor, 0.75, 0.1, 0.5 );
+				const bloomPass = bloom( scenePassColor, 0.25, 0.1, 0.5 );
 
 				postProcessing.outputNode = scenePassColor.add( bloomPass );
 
@@ -365,6 +369,7 @@ export function ThreeCanvas ({ className }: Props) {
 				partFolder.add( linksWidth, 'value', 0.001, 0.1, 0.001 ).name( 'Links width' );
 				partFolder.add( colorVariance, 'value', 0.0, 10.0, 0.01 ).name( 'Color variance' );
 				partFolder.add( colorRotationSpeed, 'value', 0.0, 5.0, 0.01 ).name( 'Color rotation speed' );
+                partFolder.add( colorOffset, 'value', 0, 10).name( 'Color offset' );
 
 				const turbFolder = gui.addFolder( 'Turbulence' );
 				turbFolder.add( turbFriction, 'value', 0.0, 0.3, 0.01 ).name( 'Friction' );
@@ -426,8 +431,10 @@ export function ThreeCanvas ({ className }: Props) {
 				spawnPosition.value.lerp( scenePointer, 0.1 );
 
 				// rotating colors
-				colorOffset.value += timer.getDelta() * colorRotationSpeed.value * timeScale.value;
-                console.log(colorOffset);
+				colorOffset.value = colorOffsetRef.current;
+
+				//timer.getDelta() * colorRotationSpeed.value * timeScale.value;
+                console.log(colorOffset, selColorOffset);
 				const elapsedTime = timer.getElapsed();
 				light.position.set(
 					Math.sin( elapsedTime * 0.5 ) * 30,
