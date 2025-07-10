@@ -6,7 +6,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Timer } from 'three/addons/misc/Timer.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import WebGPU from 'three/addons/capabilities/WebGPU.js';
-
+import { useGSAP } from "@gsap/react";
+import gsap from 'gsap';
+import { Linear } from "gsap";
 
 /**
  * 
@@ -19,20 +21,57 @@ interface Props {
 }
 
 export function ThreeCanvas ({ className, selColorOffset }: Props) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const colorOffsetRef = useRef(selColorOffset);
-	colorOffsetRef.current=selColorOffset;
+	const cameraTargetPercentage = useRef(0);
+	colorOffsetRef.current = selColorOffset;
+	const fixedPointerRef = useRef<THREE.Vector2 | undefined>(undefined);
+	
 
+	useGSAP(() => {
+		const tubePerc = {
+  			percent: 0
+		}
+		gsap.to(tubePerc, {
+			percent: .96,
+		   	ease: Linear.easeNone,
+		   	duration: 10,
+			onReverseComplete: ()=>{
+				fixedPointerRef.current = undefined;	
+			},
+			onStart: () => {
+				fixedPointerRef.current = new THREE.Vector2(0, 0);	
+			},
+		   	onUpdate: ()=>{
+				// console.log(tubePerc.percent);
+		    	cameraTargetPercentage.current = tubePerc.percent;
+		   	},
+		   	scrollTrigger: {
+				trigger: ".skills-container",
+				start: "top top",
+				end: "+=2000",
+				scrub: 1,
+				// markers: {color: "white"}
+  			}
+		});
+	})
+	
     useEffect(() => {
 			let camera: THREE.PerspectiveCamera, scene: THREE.Scene, renderer: THREE.WebGPURenderer,
-            postProcessing: THREE.PostProcessing, controls: OrbitControls, timer: Timer, light: THREE.PointLight;
+            postProcessing: THREE.PostProcessing, controls: OrbitControls, timer: Timer, 
+			light: THREE.PointLight, path: THREE.CatmullRomCurve3;
 
 			let updateParticles: THREE.ComputeNode, spawnParticles: THREE.ComputeNode; // TSL compute nodes
 			let getInstanceColor: THREE.TSL.ShaderNodeFn<[any]>; // TSL function
             let gui: GUI;
+			let normalArrow: THREE.ArrowHelper;
 
 			const screenPointer = new THREE.Vector2();
 			const scenePointer = new THREE.Vector3();
-			const raycastPlane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
+			const raycastPlane = new THREE.Plane(
+				new THREE.Vector3(0, 0, 1),
+				0
+			);
 			const raycaster = new THREE.Raycaster();
 
 			const nbParticles = Math.pow( 2, 13 );
@@ -70,8 +109,8 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 200 );
-				camera.position.set( 0, 0, 10 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 200 );
+				camera.position.set(0, 0, 10);
 
 				scene = new THREE.Scene();
 
@@ -79,8 +118,8 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
 				timer.connect( document );
 
 				// renderer
-                const canvas = document.querySelector('#myThreeJsCanvas') as HTMLCanvasElement;
-				renderer = new THREE.WebGPURenderer( { antialias: true, canvas } );
+                const canvas = canvasRef.current!;
+				renderer = new THREE.WebGPURenderer( { antialias: true, canvas} );
 				renderer.setClearColor( 0x14171a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize(canvas.clientWidth, canvas.clientHeight);
@@ -286,7 +325,7 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
 
 					} );
 
-				} )().compute( nbParticles );
+				} )().compute(nbParticles);
 
 				spawnParticles = /*#__PURE__*/ Fn( () => {
 
@@ -344,9 +383,9 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enableDamping = true;
-				controls.autoRotate = true;
+				controls = new OrbitControls(camera, renderer.domElement);
+				controls.enableDamping = false;
+				controls.autoRotate = false;
 				controls.maxDistance = 75;
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -384,57 +423,108 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
 				bloomFolder.add( bloomPass.strength, 'value', 0, 10, 0.01 ).name( 'Strength' );
 				bloomFolder.add( bloomPass.radius, 'value', 0, 1, 0.01 ).name( 'Radius' );
 
+				const planeFolder = gui.addFolder('raycastPlane');
+				planeFolder.add( raycastPlane, 'constant', -50, 50, 0.1 ).name( 'Constant' );
+				planeFolder.add( raycastPlane.normal, 'x', -20, 20, 0.1 ).name( 'Normal x' );
+				planeFolder.add( raycastPlane.normal, 'y', -20, 20, 0.1 ).name( 'Normal y' );
+				planeFolder.add( raycastPlane.normal, 'z', -20, 20, 0.1 ).name( 'Normal z' );
+				
+
+				
+				const points = [
+					new THREE.Vector3(0, 0, 50),
+					new THREE.Vector3(-10, -10, 40),
+					new THREE.Vector3(10, -20, 30),
+					new THREE.Vector3(-10, -30, 20),
+					new THREE.Vector3(10, -40, 10),
+				];
+				//Create a path from the points
+				path = new THREE.CatmullRomCurve3(points);
+				//path.curveType = 'catmullrom'; 
+				path.tension = .5;
+
+				// scene.add(cube);
+
+
+				const normalLength = 10;
+				const normalColor = 0x00ff00;
+				const normalOrigin = new THREE.Vector3(0, 0, 0); // You can set this to the plane's position if needed
+				const normalDir = new THREE.Vector3(0, 0, 5);
+				normalArrow = new THREE.ArrowHelper(normalDir, normalOrigin, normalLength, normalColor);
+				scene.add(normalArrow);
+			}
+
+			function updateCameraPercentage(percentage: number) {
+			  	const p1 = path.getPointAt(percentage);
+			  	// const p2 = path.getPointAt(percentage + 0.03);			
+
+			  	camera.position.set(p1.x,p1.y,p1.z);
+			  	// camera.lookAt(p2);
+				// controls.target.set(p1.x, p1.y, p1.z);
+			  	// light.position.set(p2.x, p2.y, p2.z);
 			}
 
 			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.aspect = canvasRef.current!.clientWidth / canvasRef.current!.clientHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(canvasRef.current!.clientWidth, canvasRef.current!.clientHeight);
 			}
 
 			function onPointerMove(e: PointerEvent) {
-
-				screenPointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-				screenPointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-
+				if(!canvasRef.current) return;
+				
+				screenPointer.x = (e.clientX / canvasRef.current!.clientWidth) * 2 - 1;
+				screenPointer.y = - (e.clientY / canvasRef.current!.clientHeight) * 2 + 1;
 			}
 
 			function updatePointer() {
-
-				raycaster.setFromCamera( screenPointer, camera );
-				raycaster.ray.intersectPlane( raycastPlane, scenePointer );
-
+				raycaster.setFromCamera(
+					// new THREE.Vector2(0, -0.8),
+					screenPointer, 
+					camera
+				);
+				
+				raycaster.ray.intersectPlane(raycastPlane, scenePointer);
 			}
 
 			function animate() {
-
 				timer.update();
-
+				
+				updateCameraPercentage(cameraTargetPercentage.current);
 				// compute particles
-				renderer.compute( updateParticles );
-				renderer.compute( spawnParticles );
+				renderer.compute(updateParticles);
+				renderer.compute(spawnParticles);
 
 				// update particle index for next spawn
-				spawnIndex.value = ( spawnIndex.value + nbToSpawn.value ) % nbParticles;
+				spawnIndex.value = (spawnIndex.value + nbToSpawn.value) % nbParticles;
 
+				// rotate plane to face camera
+				raycastPlane.normal = camera.position.clone().normalize();
+				// moves plane to constant distance from camera
+				raycastPlane.constant = -camera.position.length() + 5;
+				
 				// update raycast plane to face camera
-				raycastPlane.normal.applyEuler( camera.rotation );
-				updatePointer();
+				// raycastPlane.normal.applyEuler(camera.rotation);
+	
+				// console.log(fixedPointer, screenPointer);
+				raycaster.setFromCamera(
+					fixedPointerRef.current || screenPointer, 
+					camera
+				);
+				raycaster.ray.intersectPlane(raycastPlane, scenePointer);
+				// updatePointer();
 
 				// lerping spawn position
                 // @ts-ignore
-				previousSpawnPosition.value.copy( spawnPosition.value );
+				previousSpawnPosition.value.copy(spawnPosition.value);
                 // @ts-ignore
-				spawnPosition.value.lerp( scenePointer, 0.1 );
+				spawnPosition.value.lerp(scenePointer, 0.1);
 
 				// rotating colors
 				colorOffset.value = colorOffsetRef.current;
+				// timer.getDelta() * colorRotationSpeed.value * timeScale.value;
 
-				//timer.getDelta() * colorRotationSpeed.value * timeScale.value;
-                console.log(colorOffset, selColorOffset);
 				const elapsedTime = timer.getElapsed();
 				light.position.set(
 					Math.sin( elapsedTime * 0.5 ) * 30,
@@ -462,5 +552,5 @@ export function ThreeCanvas ({ className, selColorOffset }: Props) {
     }, []);
 
 
-    return <canvas id="myThreeJsCanvas" className={className}/>
+    return <canvas id="myThreeJsCanvas" className={className} ref={canvasRef}/>
 }
