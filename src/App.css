@@ -16,10 +16,10 @@
     font-family: "Motomangucode";
     src:
         local('Motomangucode'),
-        url("fonts/MotomangucodeRegular-eZAmp.woff2") format('woff2'),
-        url("fonts/MotomangucodeBold-4B0J4.woff2") format('woff2'),
-        url("fonts/MotomangucodeBoldItalic-ow8Wx.woff2") format('woff2'),
-        url("fonts/MotomangucodeItalic-0WXJd.woff2") format('woff2');
+        url("public/fonts/MotomangucodeRegular-eZAmp.woff2") format('woff2'),
+        url("public/fonts/MotomangucodeBold-4B0J4.woff2") format('woff2'),
+        url("public/fonts/MotomangucodeBoldItalic-ow8Wx.woff2") format('woff2'),
+        url("public/fonts/MotomangucodeItalic-0WXJd.woff2") format('woff2');
     font-display: block;
 }
 
