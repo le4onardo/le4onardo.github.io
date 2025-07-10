@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { useGlitch, } from 'react-powerglitch';
+import { useGlitch } from 'react-powerglitch';
 import { PowerGlitchOptions, PlayModes } from 'powerglitch'
 import './PowerGlitcher.css';
 

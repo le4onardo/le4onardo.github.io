@@ -6,70 +6,34 @@ import Blogs from '../../components/organisms/Blogs/Blogs';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import TextPlugin from 'gsap/TextPlugin';
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Hero from '../../components/organisms/Hero';
-import PixiBackground from '../../components/organisms/PixiBackground/PixiBackground';
-import { AssestType, assets } from '../../utils/data';
-import GlitchEmisorFilter from '../../utils/pixi-utils/GlitchEmitterFilter/GlitchEmisorFilter';
-import CRTEmisorFilter from '../../utils/pixi-utils/CRTEmitterFilter/CRTEmitterFilter';
-import { VideoBackground } from '../../components/organisms/VideoBackground/VideoBackground';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
 
 
-/*
-const getRandomVideo = () => assets[Math.floor(Math.random() * assets.length)];
-const MAX_GLITCH_INDEX = 0.3;
-const GLITCH_LOSS = 0.005;
-const CRT_LOSS = 0.015;
-const NEXT_VIDEO_THRESHOLD = 15;
-*/
+const colorOffets = [
+  // orange '#FFA500':
+   2.5,
+  // yellow '#FFFF00':
+   3.1,
+  //light green '#7CFC00':
+   4,
+  // Light Blue '#87CEFA': 
+  5.5,
+  // pink '#FFC0CB': 
+  7.5
+];
+
 
 const Home = () => {
-  /*
-  const loadThreshold = useRef(0);
-  const [backgroundVideo, setBackgroundVideo] = useState<AssestType>(assets[5]);
-  const [nextVideo, setNextVideo] = useState<AssestType>(getRandomVideo());
-
-  const cachedTickFn = (
-    filters: { glitch?: GlitchEmisorFilter, crt?: CRTEmisorFilter },
-    loading: boolean
-  ) => {
-    if (!filters) return;
-
-    const { glitch, crt } = filters;
-
-    if (loading) {
-      // glitch.intensity = MAX_GLITCH_INDEX;
-      return;
-    }
-
-    // Check if user is glitching a lot
-    if (glitch!.intensity >= MAX_GLITCH_INDEX) {
-      loadThreshold.current++;
-
-      // User glitched a lot during some time
-      if (loadThreshold.current >= NEXT_VIDEO_THRESHOLD) {
-        loadThreshold.current = 0;
-        setBackgroundVideo(nextVideo)
-        setNextVideo(getRandomVideo())
-      }
-    } else {
-      loadThreshold.current = Math.max(loadThreshold.current - 1, 0);
-    }
-
-    // Smooth glitch reduction over time
-    glitch!.intensity = Math.max(glitch!.intensity - GLITCH_LOSS, 0);
-    crt!.intensity = Math.max(crt!.intensity - CRT_LOSS, 0);
-  };
-  */
   const [startAbout, setStartAbout] = useState(false);
   const [startSkills, setSkills] = useState(false);
   const tl = useRef<gsap.core.Timeline>();
   const aboutFadein = useRef<GSAPTween>();
+  const [color, setColor] = useState(colorOffets[0]);
+
 
   useGSAP(() => {
-    tl.current = gsap.timeline();
+    tl.current = gsap.timeline(colorOffets);
 
     const heroTween = gsap.to('.hero-container', {
       opacity: 0,
@@ -117,24 +81,16 @@ const Home = () => {
       }
     });
 
-    tl.current.to('.skills-container', {
-      opacity: 1,
-      duration: 3,
-      filter: 'blur(0px)',
-      /*scrollTrigger: {
-        trigger: '#home-container',
-        start: 7000,
-        end: "+=3000",
-        scrub: true,
-      }*/
-      /*
-      onComplete: () => {
-        //if (tl.progress() > 0.4) {
-        setSkills(true);
-        console.log('skills start')
-        // }
+    gsap.to('.skills-container', {
+      opacity: 0,
+      filter: 'blur(60px)',
+      scale: 0.9,
+      scrollTrigger: {
+        trigger: '.skills-container',
+        start: "top top-=10",
+        end: "+=1000",
+        scrub: 1,
       }
-      */
     });
     /*
         ScrollTrigger.create({
@@ -149,70 +105,20 @@ const Home = () => {
         });
         */
   });
-  /*
-  useGSAP(() => {
-    if (!startAbout) return;
-    aboutFadein.current?.kill();
-
-    gsap.fromTo('.about-container', {
-      opacity: 0,
-      filter: 'blur(20px)',
-      // duration: 1,
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: '#home-container',
-        start: 500,
-        end: "+=500",
-        scrub: true,
-      }
-    }, {
-      opacity: 1,
-      filter: 'blur(0px)',
-      // duration: 1,
-      onStart: () => console.log('about IN START'),
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: '#home-container',
-        start: 1000,
-        end: "+=500",
-        scrub: true,
-      }
-    });
-    console.log('inserting about fadein');
-
-  }, [startAbout])
-*/
-  useGSAP(() => {
-  }, [startSkills])
 
   return (
-    <MainLayout classProps='tw:scroll-smooth tw:relative'>
+    <MainLayout classProps='tw:scroll-smooth tw:relative' color={color}>
+      
+
       <div id="home-container">
-        <Hero className='tw:relative tw:pt-16 hero-container' />
+        <Hero className='tw:relative tw:pt-16 hero-container' onColorChange={(_color, index) => setColor(colorOffets[index])}/>
 
-        <AboutMe className='tw:relative tw:w-full tw:pt-56 about-container' trigger={startAbout} />
-
-        {/*
-          <div className='tw:relative tw:mt-12'>
-          {
-
-              // <link rel="" href={backgroundVideo.backgroundUrl} type="image/png" />
-              // <img style={{ height: 700, width: 1400 }} src={backgroundVideo.backgroundUrl}></img>
-              <>
-                <PixiBackground height={700} width={1400} videoData={backgroundVideo} nextVideoData={nextVideo} className='sticky top-[65px]'
-                  ticker={cachedTickFn}
-                />
-              </>
-              // assets.map(videoData => <PixiBackground height={700} width={1400} videoData={videoData} />)
-
-          }
-          </div>
-        */}
-        <div className='tw:absolute skills-container'>
-          <Skills className='tw:mt-64 tw:pt-32 tw:h-[900px]' />
-        </div>
+        <AboutMe className='tw:relative tw:w-full tw:pt-48 tw:mt-8 about-container' trigger={startAbout} />
+        
+        <Skills className='tw:mt-64 tw:pt-32 tw:h-[900px] skills-container' />
+        
       </div>
-      <Blogs className='tw:mb-20' />
+      <Blogs className='tw:mb-20 tw:h-[900px]' />
     </MainLayout >
   );
 };

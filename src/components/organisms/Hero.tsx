@@ -5,7 +5,7 @@ import { SplitText } from "gsap/SplitText";
 import { twMerge } from "tailwind-merge";
 import LordIcon from "../icons/LordIcon";
 import { Player } from '@lordicon/react';
-import { VideoBackground } from "./VideoBackground/VideoBackground";
+// import { CustomWiggle, RoughEase } from "gsap/all";
 
 
 const roles = [
@@ -17,7 +17,6 @@ const roles = [
             hover: 'hover-pinch'
         },
         color: '#FFA500', // Orange
-        videoHue: 155,
         buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_orange] tw:text-[#FFA500]'
     },
     {
@@ -28,7 +27,6 @@ const roles = [
             hover: 'loop-rotation',
         },
         color: '#FFFF00', // Yellow
-        videoHue: 190,
         buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_yellow] tw:text-[#FFFF00]'
     },
     {
@@ -39,7 +37,6 @@ const roles = [
             hover: 'hover-line',
         },
         color: '#7CFC00',   // Light Green
-        videoHue: 230,
         buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_lightgreen] tw:text-[#7CFC00]'
     },
     {
@@ -50,7 +47,6 @@ const roles = [
             hover: 'hover-pinch',
         },
         color: '#87CEFA', // Light Blue
-        videoHue: 300,
         buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_lightblue] tw:text-[#87CEFA]'
     },
     {
@@ -61,7 +57,6 @@ const roles = [
             hover: 'hover-heartbeat',
         },
         color: '#FFC0CB', // Pink
-        videoHue: 30,
         buttonClassname: 'tw:transition-[filter] tw:duration-400 tw:hover:drop-shadow-[0_4px_3px_pink] tw:text-[#FFC0CB]'
     },
 ]
@@ -72,19 +67,19 @@ interface Props {
 }
 
 
-export default function Hero({ className = '' }: Props) {
+export default function Hero({ className = '', onColorChange }: Props) {
     const [active, setActive] = useState<number>(0);
     const [iconState, setIconState] = useState<string>('in-reveal');
     const [hover, setHover] = useState(false);
-    const [videoHue, setVideoHue] = useState<number>(155);
 
     const container = useRef<HTMLDivElement>(null);
     const iconsPlayers = useRef<Array<Player | null>>([]);
     const roleNames = useRef<SplitText[]>([]);
 
     const { contextSafe } = useGSAP(() => {
-        let mainTimeline = gsap.timeline();
-        let title = SplitText.create('.header-title', { type: "chars", smartWrap: true })
+        const mainTimeline = gsap.timeline();
+        const title = SplitText.create('.header-title', { type: "chars", smartWrap: true })
+        
         mainTimeline.from(title.chars, {
             opacity: 0,
             filter: 'blur(10px)',
@@ -94,7 +89,7 @@ export default function Hero({ className = '' }: Props) {
             stagger: 0.1,
         });
 
-        let author = SplitText.create('.header-author', { type: "words", smartWrap: true })
+        const author = SplitText.create('.header-author', { type: "words", smartWrap: true })
         mainTimeline.from(author.words, {
             opacity: 0,
             filter: 'blur(10px)',
@@ -142,7 +137,7 @@ export default function Hero({ className = '' }: Props) {
         const position = target.className.includes('role-char') ?
             [...target.parentElement!.childNodes].findIndex(node => node === e.target) :
             role.name.length;
-        let tl = gsap.timeline();
+        const tl = gsap.timeline();
 
         tl.to(`.role-${active} .role-char, .role-${active} .lordicon`, {
             opacity: 0,
@@ -178,12 +173,8 @@ export default function Hero({ className = '' }: Props) {
             }
         });
 
-        const rotationCount = Math.floor(videoHue / 360);
-        // last hue degree is minor than previous, this ensures videoHue is always larger than previous
-        const degreeBase = nextActive === roles.length - 1 ?
-            (rotationCount + 1) * 360 :
-            rotationCount * 360;
-        setVideoHue(degreeBase + nextRole.videoHue);
+
+        onColorChange && onColorChange(nextRole.color, nextActive)
         setActive(nextActive);
     });
 
@@ -196,11 +187,7 @@ export default function Hero({ className = '' }: Props) {
         }
     };
 
-
     return <div className={twMerge('tw:flex tw:flex-col tw:justify-evenlytw:text-white', className)} ref={container}>
-        <div className={`tw:absolute tw:w-fit tw:h-full tw:right-0`}>
-            <VideoBackground className="tw:top-[80px] tw:cursor-pointer hero-video" hue={videoHue} />
-        </div>
         <div className='tw:max-w-none tw:m-auto tw:text-center tw:mt-24 
         tw:text-[6rem] tw:lg:max-w-[30rem] tw:lg:text-[60px] tw:lg:mb-40 tw:lg:mx-0
         tw:lg:mt-40 tw:lg:font-bold tw:lg:block tw:lg:min-h-[288px] tw:lg:text-left'>
