@@ -43,6 +43,7 @@ export default function AboutMe({ trigger, timeline, className = '' }: Props) {
         if (!trigger) return;
         const tl = timeline || gsap.timeline();
 
+        // Fades in title, description and image
         tl.to(titleSplit.current!.chars, {
             x: 0,
             opacity: 1,

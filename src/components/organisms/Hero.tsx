@@ -138,7 +138,9 @@ export default function Hero({ className = '', onColorChange }: Props) {
             [...target.parentElement!.childNodes].findIndex(node => node === e.target) :
             role.name.length;
         const tl = gsap.timeline();
-
+        /**
+         * Fades out current role chars and icon
+         */
         tl.to(`.role-${active} .role-char, .role-${active} .lordicon`, {
             opacity: 0,
             filter: 'blur(10px)',
@@ -150,9 +152,15 @@ export default function Hero({ className = '', onColorChange }: Props) {
                 each: 0.05
             }
         });
+        /**
+         * Inmediately reverts the current scale for next transition
+         */
         tl.set(`.role-${active} .role-char, .role-${active} .lordicon`, {
             scale: 1
         });
+        /**
+         * Fades in next role chars
+         */
         tl.to(`.role-${nextActive} .role-char`, {
             filter: 'blur(0px)',
             scale: 1,
@@ -163,10 +171,17 @@ export default function Hero({ className = '', onColorChange }: Props) {
                 each: 0.05
             }
         }, '<-=1');
+
+        /** 
+         * Inmediately sets the next icon with visible css
+         */
         tl.set(`.role-${nextActive} .lordicon`, {
             opacity: 1,
             filter: 'blur(0px)',
             scale: 1,
+            /**
+             * After the icon is no hidden, playing the animation will make finally appear
+             */
             onComplete: () => {
                 setIconState(nextRole.iconData.reveal);
                 iconsPlayers.current[nextActive]?.play()
