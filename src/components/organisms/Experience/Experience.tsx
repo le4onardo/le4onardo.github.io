@@ -82,10 +82,15 @@ export default function Experience({ className }: Props) {
 
     const { contextSafe } = useGSAP(() => {
         data.map((_role, index) => {
-            jobsDataChars.current[index] = SplitText.create(`.job-${index}`, {
+            jobsDataChars.current[index] = SplitText.create(`.job-${index} .job-description`, {
                 type: 'words',
                 wordsClass: 'job-word tw:opacity-0 tw:blur-md'
             });
+        });
+
+        gsap.set('.job-technologies .job-word', {
+            opacity: 0,
+            filter: 'blur(10px)'
         });
     }, []);
 
@@ -106,9 +111,6 @@ export default function Experience({ className }: Props) {
                 duration: 0.5,
                 onStart: () => {
                     console.log('fade out start');
-                },
-                stagger: {
-                    // each: 0.005
                 }
             });
             // Inmediately reverts the current scale for next transition
@@ -117,11 +119,10 @@ export default function Experience({ className }: Props) {
             });
         }
         /**
-         * Fades in next role chars
+         * Fades in next role words
          */
-
         tl.to(
-            `.job-${nextActive} .job-word`,
+            `.job-${nextActive} .job-description .job-word`,
             {
                 filter: 'blur(0px)',
                 opacity: 1,
@@ -130,13 +131,25 @@ export default function Experience({ className }: Props) {
                 onStart: () => {
                     console.log('fade in start', nextActive);
                 },
-                // duration: 1,
                 stagger: {
                     each: 0.005
                 }
             },
             active! >= 0 ? '>-0.5' : undefined
         );
+
+        tl.to(`.job-${nextActive} .job-technologies .job-word`, {
+            filter: 'blur(0px)',
+            opacity: 1,
+            scale: 1,
+            color: '#ffffff',
+            onStart: () => {
+                console.log('fade in start', nextActive);
+            },
+            stagger: {
+                each: 0.05
+            }
+        });
 
         setActive(nextActive);
     });
@@ -201,16 +214,16 @@ export default function Experience({ className }: Props) {
                 <div className='tw:flex-1/2 tw:relative tw:h-full'>
                     {data.map((item, index) => (
                         <div key={item.company} className={`job-${index} tw:absolute tw:w-full tw:top-0 `}>
-                            <div className={`job-description `}>{item.description}</div>
+                            <div className={`job-description`}>{item.description}</div>
                             <div className={'job-technologies tw:mt-4 tw:flex tw:gap-x-4 tw:flex-wrap tw:items-center'}>
                                 <div className='job-word'>Technologies: </div>
                                 {item.technologies.map((tech, index) => {
                                     return (
                                         <>
-                                            <div
-                                                key={tech}
-                                                className='job-word tw:flex tw:gap-x-2 tw:before:w-1.5 tw:before:h-1.5 tw:before:rounded-full tw:before:bg-white'
-                                            >
+                                            {index > 0 && (
+                                                <div className='job-word tw:rounded-2xl tw:w-1.5 tw:h-1.5 tw:bg-white' />
+                                            )}
+                                            <div key={tech} className='job-word tw:flex tw:gap-x-2'>
                                                 {tech}
                                             </div>
                                         </>
