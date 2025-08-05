@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import * as THREE from 'three/webgpu';
 import {
     atan,
@@ -45,15 +45,18 @@ import { Linear } from 'gsap';
  */
 interface Props {
     className: string;
-    selColorOffset: number;
+    colorOffset?: number;
+    friction?: number;
 }
 
-export function ThreeCanvas({ className, selColorOffset }: Props) {
+export function ThreeCanvas({ className, colorOffset, friction = 0.01 }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const colorOffsetRef = useRef(selColorOffset);
-    const cameraTargetPercentage = useRef(0);
-    colorOffsetRef.current = selColorOffset;
     const fixedPointerRef = useRef<THREE.Vector2 | undefined>(undefined);
+    const cameraTargetPercentage = useRef(0);
+    const colorOffsetRef = useRef(colorOffset);
+    colorOffsetRef.current = colorOffset;
+    const frictionRef = useRef(friction);
+    frictionRef.current = friction;
 
     useGSAP(() => {
         const tubePerc = {
@@ -517,14 +520,15 @@ export function ThreeCanvas({ className, selColorOffset }: Props) {
             raycaster.ray.intersectPlane(raycastPlane, scenePointer);
         }
 
-        let flag = 0;
+        // let flag = 0;
         function animate() {
+            /*
             if (flag % 2 == 1) {
                 flag = 0;
                 return;
             } else {
                 flag++;
-            }
+            }*/
 
             timer.update();
 
@@ -557,6 +561,7 @@ export function ThreeCanvas({ className, selColorOffset }: Props) {
 
             // rotating colors
             colorOffset.value = colorOffsetRef.current;
+            turbFriction.value = frictionRef.current;
             // timer.getDelta() * colorRotationSpeed.value * timeScale.value;
 
             const elapsedTime = timer.getElapsed();
