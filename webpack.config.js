@@ -75,4 +75,7 @@ module.exports = {
       chunks: [] // file only for redirection, no JS must be loaded
     })
   ],
+  experiments: {
+    topLevelAwait: true
+  }
 };
