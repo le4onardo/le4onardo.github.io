@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three/webgpu';
 import {
     atan,
@@ -49,7 +49,7 @@ interface Props {
     friction?: number;
 }
 
-export function ThreeCanvas({ className, colorOffset, friction = 0.01 }: Props) {
+export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fixedPointerRef = useRef<THREE.Vector2 | undefined>(undefined);
     const cameraTargetPercentage = useRef(0);
