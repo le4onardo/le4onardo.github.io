@@ -29,7 +29,7 @@ import {
     uv,
     uniform
 } from 'three/tsl';
-import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import BloomNode, { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Timer } from 'three/addons/misc/Timer.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -45,18 +45,61 @@ import { Linear } from 'gsap';
  */
 interface Props {
     className: string;
+    // Particles
     colorOffset?: number;
+    // Turbulence
     friction?: number;
+    frequency?: number;
+    amplitude?: number;
+    octaves?: number;
+    lacunarity?: number;
+    gain?: number;
+    // Bloom
+    bloomRadius?: number;
+    bloomStrength?: number;
+    bloomThreshold?: number;
 }
 
-export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Props) {
+export function ThreeCanvas({
+    className,
+    colorOffset = 0,
+
+    friction = 0.08,
+    frequency = 0.5,
+    amplitude = 5,
+    octaves = 2,
+    lacunarity = 2,
+    gain = 0.5,
+
+    bloomRadius = 0.1,
+    bloomStrength = 0.25,
+    bloomThreshold = 0.5
+}: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fixedPointerRef = useRef<THREE.Vector2 | undefined>(undefined);
     const cameraTargetPercentage = useRef(0);
     const colorOffsetRef = useRef(colorOffset);
     colorOffsetRef.current = colorOffset;
+
     const frictionRef = useRef(friction);
     frictionRef.current = friction;
+    const frequencyRef = useRef(frequency);
+    frequencyRef.current = frequency;
+    const amplitudeRef = useRef(amplitude);
+    amplitudeRef.current = amplitude;
+    const octavesRef = useRef(octaves);
+    octavesRef.current = octaves;
+    const lacunarityRef = useRef(lacunarity);
+    lacunarityRef.current = lacunarity;
+    const gainRef = useRef(gain);
+    gainRef.current = gain;
+
+    const bloomRadiusRef = useRef(bloomRadius);
+    bloomRadiusRef.current = bloomRadius;
+    const bloomStrengthRef = useRef(bloomStrength);
+    bloomStrengthRef.current = bloomStrength;
+    const bloomThresholdRef = useRef(bloomThreshold);
+    bloomThresholdRef.current = bloomThreshold;
 
     useGSAP(() => {
         const tubePerc = {
@@ -67,7 +110,7 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
             ease: Linear.easeNone,
             duration: 10,
             onReverseComplete: () => {
-                fixedPointerRef.current = undefined;
+                // fixedPointerRef.current = undefined;
             },
             onStart: () => {
                 // fixedPointerRef.current = new THREE.Vector2(0, 0);
@@ -100,6 +143,7 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
         let getInstanceColor: THREE.TSL.ShaderNodeFn<[any]>; // TSL function
         let gui: GUI;
         let normalArrow: THREE.ArrowHelper;
+        let bloomPass: THREE.TSL.ShaderNodeObject<BloomNode>;
 
         const screenPointer = new THREE.Vector2();
         const scenePointer = new THREE.Vector3();
@@ -109,7 +153,7 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
         const nbParticles = Math.pow(2, 13);
 
         const timeScale = uniform(1.0);
-        const particleLifetime = uniform(0.5);
+        const particleLifetime = uniform(0.2);
         const particleSize = uniform(1.0);
         const linksWidth = uniform(0.005);
 
@@ -412,7 +456,7 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
             const scenePass = pass(scene, camera);
             const scenePassColor = scenePass.getTextureNode('output');
 
-            const bloomPass = bloom(scenePassColor, 0.25, 0.1, 0.5);
+            bloomPass = bloom(scenePassColor, 0.25, 0.1, 0.5);
 
             postProcessing.outputNode = scenePassColor.add(bloomPass);
 
@@ -446,17 +490,17 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
             partFolder.add(colorOffset, 'value', 0, 10).name('Color offset');
 
             const turbFolder = gui.addFolder('Turbulence');
-            turbFolder.add(turbFriction, 'value', 0.0, 0.3, 0.01).name('Friction');
-            turbFolder.add(turbFrequency, 'value', 0.0, 1.0, 0.01).name('Frequency');
-            turbFolder.add(turbAmplitude, 'value', 0.0, 10.0, 0.01).name('Amplitude');
-            turbFolder.add(turbOctaves, 'value', 1, 9, 1).name('Octaves');
-            turbFolder.add(turbLacunarity, 'value', 1.0, 5.0, 0.01).name('Lacunarity');
-            turbFolder.add(turbGain, 'value', 0.0, 1.0, 0.01).name('Gain');
+            turbFolder.add(frictionRef, 'current', 0.0, 0.3, 0.01).name('Friction');
+            turbFolder.add(frequencyRef, 'current', 0.0, 1.0, 0.01).name('Frequency');
+            turbFolder.add(amplitudeRef, 'current', 0.0, 10.0, 0.01).name('Amplitude');
+            turbFolder.add(octavesRef, 'current', 1, 9, 1).name('Octaves');
+            turbFolder.add(lacunarityRef, 'current', 1.0, 5.0, 0.01).name('Lacunarity');
+            turbFolder.add(gainRef, 'current', 0.0, 1.0, 0.01).name('Gain');
 
             const bloomFolder = gui.addFolder('bloom');
-            bloomFolder.add(bloomPass.threshold, 'value', 0, 2.0, 0.01).name('Threshold');
-            bloomFolder.add(bloomPass.strength, 'value', 0, 10, 0.01).name('Strength');
-            bloomFolder.add(bloomPass.radius, 'value', 0, 1, 0.01).name('Radius');
+            bloomFolder.add(bloomThresholdRef, 'current', 0, 2.0, 0.01).name('Threshold');
+            bloomFolder.add(bloomStrengthRef, 'current', 0, 10, 0.01).name('Strength');
+            bloomFolder.add(bloomRadiusRef, 'current', 0, 1, 0.01).name('Radius');
 
             const planeFolder = gui.addFolder('raycastPlane');
             planeFolder.add(raycastPlane, 'constant', -50, 50, 0.1).name('Constant');
@@ -520,16 +564,71 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
             raycaster.ray.intersectPlane(raycastPlane, scenePointer);
         }
 
-        // let flag = 0;
-        function animate() {
-            /*
-            if (flag % 2 == 1) {
-                flag = 0;
-                return;
-            } else {
-                flag++;
-            }*/
+        function randomPoints() {
+            const pointsCount = 5;
+            const range = 4;
+            const randomPoints = Array.from(Array(pointsCount)).map(() => {
+                return new THREE.Vector3(range * Math.random() - range / 2, range * Math.random() - range / 2, 0);
+            });
+            return randomPoints;
+        }
 
+        function logSpiralPoints() {
+            const points = [];
+            const a = 0.4; // starting size
+            const b = 0.02; // growth rate
+            const turns = 6;
+            const steps = 20;
+
+            for (let i = steps; i >= 0; i--) {
+                const theta = i * ((turns * 2 * Math.PI) / steps);
+                const r = a * Math.exp(b * theta);
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+                points.push(new THREE.Vector3(x, y, 0)); // 2D spiral on XY plane
+            }
+            return points;
+        }
+
+        const lighPath1 = new THREE.CatmullRomCurve3(randomPoints());
+        lighPath1.tension = 1;
+        lighPath1.curveType = 'catmullrom';
+        const lighPath2 = new THREE.CatmullRomCurve3(logSpiralPoints());
+        lighPath1.tension = 1;
+        lighPath1.curveType = 'catmullrom';
+        const paths = [lighPath1, lighPath2];
+        const pathEpsilons = [0.005, 0.007];
+        const pathPercentages = [0, 0];
+        let pathIndex = 0;
+
+        function nextPointerPosition() {
+            if (pathIndex >= pathPercentages.length) {
+                fixedPointerRef.current = undefined;
+                return;
+            }
+            if (!fixedPointerRef.current) {
+                fixedPointerRef.current = new THREE.Vector2();
+            }
+            const randomPoint = paths[pathIndex]?.getPointAt(pathPercentages[pathIndex]);
+
+            fixedPointerRef.current.x = randomPoint.x;
+            fixedPointerRef.current.y = randomPoint.y;
+
+            pathPercentages[pathIndex] += pathEpsilons[pathIndex];
+            if (pathPercentages[pathIndex] >= 1) pathIndex += 1;
+        }
+
+        function mouseSin() {
+            if (!fixedPointerRef.current || fixedPointerRef.current.x > 1.5)
+                fixedPointerRef.current = new THREE.Vector2(-1.5, 0);
+            else fixedPointerRef.current.x += 0.01;
+
+            fixedPointerRef.current.y = Math.sin(fixedPointerRef.current.x * 10);
+        }
+
+        function animate() {
+            // mouseSin();
+            nextPointerPosition();
             timer.update();
 
             updateCameraPercentage(cameraTargetPercentage.current);
@@ -551,6 +650,7 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
             // console.log(fixedPointer, screenPointer);
             raycaster.setFromCamera(fixedPointerRef.current || screenPointer, camera);
             raycaster.ray.intersectPlane(raycastPlane, scenePointer);
+
             // updatePointer();
 
             // lerping spawn position
@@ -561,7 +661,21 @@ export function ThreeCanvas({ className, colorOffset = 0, friction = 0.01 }: Pro
 
             // rotating colors
             colorOffset.value = colorOffsetRef.current;
+
+            // Turbulence
             turbFriction.value = frictionRef.current;
+            turbFrequency.value = frequencyRef.current;
+            turbAmplitude.value = amplitudeRef.current;
+            turbOctaves.value = octavesRef.current;
+            turbLacunarity.value = lacunarityRef.current;
+            turbGain.value = gainRef.current;
+
+            // Bloom
+            bloomPass.threshold.value = bloomThresholdRef.current;
+            bloomPass.strength.value = bloomStrengthRef.current;
+            bloomPass.radius.value = bloomRadiusRef.current;
+
+            // colorOffset.value +=
             // timer.getDelta() * colorRotationSpeed.value * timeScale.value;
 
             const elapsedTime = timer.getElapsed();
