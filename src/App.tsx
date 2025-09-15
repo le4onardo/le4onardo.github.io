@@ -4,6 +4,7 @@ import TestBlog from './pages/blogs/TestBlog/TestBlog.mdx';
 import './App.css';
 import { useEffect } from 'react';
 import './utils/gsap';
+import StateProvider from './store/Context';
 
 const App = () => {
     useEffect(() => {
@@ -19,12 +20,14 @@ const App = () => {
         }
     }, []);
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/:blogTitle' element={<TestBlog />} />
-            </Routes>
-        </BrowserRouter>
+        <StateProvider initialState={{ colorOffset: 2.5 }}>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={<Home />} />
+                    <Route path='/:blogTitle' element={<TestBlog />} />
+                </Routes>
+            </BrowserRouter>
+        </StateProvider>
     );
 };
 
