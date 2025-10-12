@@ -46,7 +46,12 @@ import { Linear } from 'gsap';
 interface Props {
     className: string;
     // Particles
+    timeScale?: number;
+    lifetime?: number;
+    linksWidth?: number;
     colorOffset?: number;
+    spawnRate?: number;
+    size?: number;
     // Turbulence
     friction?: number;
     frequency?: number;
@@ -62,24 +67,39 @@ interface Props {
 
 export function ThreeCanvas({
     className,
+    timeScale = 1,
+    lifetime = 1,
     colorOffset = 0,
-
-    friction = 0.08,
+    linksWidth = 0,
+    spawnRate = 5,
+    size = 0.5,
+    friction = 0.01,
     frequency = 0.5,
-    amplitude = 5,
+    amplitude = 0.2,
+    // amplitude = 0,
     octaves = 2,
     lacunarity = 2,
     gain = 0.5,
 
     bloomRadius = 0.1,
-    bloomStrength = 0.25,
-    bloomThreshold = 0.5
+    bloomStrength = 0.1,
+    bloomThreshold = 2
 }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fixedPointerRef = useRef<THREE.Vector2 | undefined>(undefined);
     const cameraTargetPercentage = useRef(0);
+    const timeScaleRef = useRef(timeScale);
+    timeScaleRef.current = timeScale;
+    const lifetimeRef = useRef(lifetime);
+    lifetimeRef.current = lifetime;
+    const linksWidthRef = useRef(linksWidth);
+    linksWidthRef.current = linksWidth;
     const colorOffsetRef = useRef(colorOffset);
     colorOffsetRef.current = colorOffset;
+    const sizeRef = useRef(size);
+    sizeRef.current = size;
+    const spawnRef = useRef(spawnRate);
+    spawnRef.current = spawnRate;
 
     const frictionRef = useRef(friction);
     frictionRef.current = friction;
@@ -463,8 +483,10 @@ export function ThreeCanvas({
             // controls
 
             controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = false;
-            controls.autoRotate = false;
+            controls.enableDamping = true;
+            controls.enableZoom = false;
+            controls.autoRotate = true;
+            // controls.enablePan = true;
             controls.maxDistance = 75;
             window.addEventListener('resize', onWindowResize);
 
@@ -480,11 +502,11 @@ export function ThreeCanvas({
             gui.add(controls, 'autoRotateSpeed', -10.0, 10.0, 0.01).name('Auto Rotate Speed');
 
             const partFolder = gui.addFolder('Particles');
-            partFolder.add(timeScale, 'value', 0.0, 4.0, 0.01).name('timeScale');
-            partFolder.add(nbToSpawn, 'value', 1, 100, 1).name('Spawn rate');
-            partFolder.add(particleSize, 'value', 0.01, 3.0, 0.01).name('Size');
-            partFolder.add(particleLifetime, 'value', 0.01, 2.0, 0.01).name('Lifetime');
-            partFolder.add(linksWidth, 'value', 0.001, 0.1, 0.001).name('Links width');
+            partFolder.add(timeScaleRef, 'current', 0.0, 4.0, 0.01).name('Time scale');
+            partFolder.add(spawnRef, 'current', 1, 100, 1).name('Spawn rate');
+            partFolder.add(sizeRef, 'current', 0.01, 3.0, 0.01).name('Size');
+            partFolder.add(lifetimeRef, 'current', 0.01, 2.0, 0.01).name('Lifetime');
+            partFolder.add(linksWidthRef, 'current', 0, 0.1, 0.001).name('Links width');
             partFolder.add(colorVariance, 'value', 0.0, 10.0, 0.01).name('Color variance');
             partFolder.add(colorRotationSpeed, 'value', 0.0, 5.0, 0.01).name('Color rotation speed');
             partFolder.add(colorOffset, 'value', 0, 10).name('Color offset');
@@ -528,6 +550,12 @@ export function ThreeCanvas({
             const normalDir = new THREE.Vector3(0, 0, 5);
             normalArrow = new THREE.ArrowHelper(normalDir, normalOrigin, normalLength, normalColor);
             scene.add(normalArrow);
+
+            // Add a square to visualize 1:1 proportions
+            const geometry = new THREE.PlaneGeometry(5, 5); // width = height
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const square = new THREE.Mesh(geometry, material);
+            // scene.add(square);
         }
 
         function updateCameraPercentage(percentage: number) {
@@ -541,7 +569,11 @@ export function ThreeCanvas({
         }
 
         function onWindowResize() {
-            camera.aspect = canvasRef.current!.clientWidth / canvasRef.current!.clientHeight;
+            // @ts-ignore
+            if (camera.aspect) {
+                // @ts-ignore
+                camera.aspect = canvasRef.current!.clientWidth / canvasRef.current!.clientHeight;
+            }
             camera.updateProjectionMatrix();
 
             renderer.setSize(canvasRef.current!.clientWidth, canvasRef.current!.clientHeight);
@@ -563,59 +595,202 @@ export function ThreeCanvas({
 
             raycaster.ray.intersectPlane(raycastPlane, scenePointer);
         }
+        /*
+        function adjustAspectRatio<T>(point: T) {
+            const { clientHeight, clientWidth } = canvasRef.current!;
+            const aspect = clientHeight / clientWidth;
+            const vector = point as THREE.Vector2 | THREE.Vector3;
+            if (aspect < 1) {
+                vector.x = vector.x * aspect;
+            }
+
+            if (aspect > 1) {
+                vector.y = vector.y / aspect;
+            }
+            return point;
+        }
 
         function randomPoints() {
-            const pointsCount = 5;
-            const range = 4;
+            const pointsCount = 10;
+            const range = 3;
             const randomPoints = Array.from(Array(pointsCount)).map(() => {
-                return new THREE.Vector3(range * Math.random() - range / 2, range * Math.random() - range / 2, 0);
+                const x = range * Math.random() - range / 2;
+                const y = range * Math.random() - range / 2;
+
+                return adjustAspectRatio(new THREE.Vector3(x, y, 0));
             });
-            return randomPoints;
+            return [randomPoints];
+        }
+
+        function gearPoints() {
+            // ⚙️ Create Gear Shape Points
+            const gearPoints = [];
+            const teeth = 8;
+            const innerRadius = 1;
+            const outerRadius = 1.4;
+            const stepsPerTooth = 64; // more = smoother
+            const totalSteps = teeth * stepsPerTooth;
+
+            const scale = 0.5; // 🔧 You can change the scale here
+
+            for (let i = 0; i <= totalSteps; i++) {
+                const angle = (i / totalSteps) * Math.PI * 2;
+                const radius = i % stepsPerTooth < stepsPerTooth / 2 ? outerRadius : innerRadius;
+                const x = scale * radius * Math.cos(angle);
+                const y = scale * radius * Math.sin(angle);
+                gearPoints.push(adjustAspectRatio(new THREE.Vector3(x, y, 0)));
+            }
+
+            // Inner circle (for gear hole)
+            const holePoints = [];
+            const holeSteps = 60;
+            const holeRadius = 0.4;
+
+            for (let i = 0; i <= holeSteps; i++) {
+                const angle = (i / holeSteps) * Math.PI * 2;
+                const x = scale * holeRadius * Math.cos(angle);
+                const y = scale * holeRadius * Math.sin(angle);
+
+                holePoints.push(adjustAspectRatio(new THREE.Vector3(x, y, 0)));
+            }
+            return [gearPoints, holePoints];
         }
 
         function logSpiralPoints() {
             const points = [];
             const a = 0.4; // starting size
-            const b = 0.02; // growth rate
-            const turns = 6;
-            const steps = 20;
+            const b = 0.01; // growth rate
+            const turns = 10;
+            const steps = 30;
 
             for (let i = steps; i >= 0; i--) {
                 const theta = i * ((turns * 2 * Math.PI) / steps);
                 const r = a * Math.exp(b * theta);
                 const x = r * Math.cos(theta);
                 const y = r * Math.sin(theta);
-                points.push(new THREE.Vector3(x, y, 0)); // 2D spiral on XY plane
+                points.push(adjustAspectRatio(new THREE.Vector3(x, y, 0))); // 2D spiral on XY plane
             }
-            return points;
+            return [points];
         }
 
-        const lighPath1 = new THREE.CatmullRomCurve3(randomPoints());
-        lighPath1.tension = 1;
-        lighPath1.curveType = 'catmullrom';
-        const lighPath2 = new THREE.CatmullRomCurve3(logSpiralPoints());
-        lighPath1.tension = 1;
-        lighPath1.curveType = 'catmullrom';
-        const paths = [lighPath1, lighPath2];
-        const pathEpsilons = [0.005, 0.007];
-        const pathPercentages = [0, 0];
-        let pathIndex = 0;
+        function getEstimatedPencilPaths(scale: number = 1): THREE.Vector3[][] {
+            // Define paths manually approximated from the image
+            const rawPaths: number[][][] = [
+                // Outer shape
+                [
+                    [10, 10],
+                    [20, 30],
+                    [30, 90],
+                    [35, 130],
+                    [38, 180],
+                    [38, 250],
+                    [36, 280],
+                    [30, 300],
+                    [20, 310],
+                    [10, 300],
+                    [5, 280],
+                    [2, 250],
+                    [2, 180],
+                    [4, 130],
+                    [10, 90],
+                    [15, 30],
+                    [10, 10]
+                ],
 
+                // Left pencil edge line
+                [
+                    [14, 30],
+                    [24, 90],
+                    [30, 130],
+                    [32, 180],
+                    [32, 240]
+                ],
+
+                // Right pencil edge line
+                [
+                    [20, 30],
+                    [28, 90],
+                    [32, 130],
+                    [34, 180],
+                    [34, 240]
+                ],
+
+                // Eraser band
+                [
+                    [4, 250],
+                    [36, 250]
+                ],
+
+                // Eraser top
+                [
+                    [6, 300],
+                    [34, 300]
+                ]
+            ];
+
+            // Convert all paths into THREE.Vector3 arrays and apply scale
+            return rawPaths.map((path) =>
+                path.map(([x, y]) => adjustAspectRatio(new THREE.Vector3(x * scale, -y * scale, 0)))
+            );
+        }
+
+        function codePoints() {
+            const scale = 1;
+            const leftBracket = [
+                adjustAspectRatio(new THREE.Vector3(-0.5 * scale, -0.5 * scale, 0)),
+                adjustAspectRatio(new THREE.Vector3(-1 * scale, 0 * scale, 0)),
+                adjustAspectRatio(new THREE.Vector3(-0.5 * scale, 0.5 * scale, 0))
+            ];
+            const rightBracket = [
+                adjustAspectRatio(new THREE.Vector3(0.5 * scale, -0.5 * scale, 0)),
+                adjustAspectRatio(new THREE.Vector3(1 * scale, 0 * scale, 0)),
+                adjustAspectRatio(new THREE.Vector3(0.5 * scale, 0.5 * scale, 0))
+            ];
+            const slash = [
+                adjustAspectRatio(new THREE.Vector3(0.25 * scale, 0.65 * scale, 0)),
+                adjustAspectRatio(new THREE.Vector3(-0.25 * scale, -0.65 * scale, 0))
+            ];
+            return [leftBracket, rightBracket, slash];
+        }
+
+        function convertToPaths(paths: THREE.Vector3[][]) {
+            const catMullPaths = paths.map((path) => {
+                const catMulPath = new THREE.CatmullRomCurve3(path);
+                catMulPath.tension = 1;
+                catMulPath.curveType = 'centripetal';
+
+                console.log(catMulPath.getLength());
+                return {
+                    catMulPath
+                };
+            });
+
+            return catMullPaths;
+        }
+        const catMullPaths = convertToPaths(gearPoints());
+
+        let pathIndex = 0;
+        let percentage = 0;
         function nextPointerPosition() {
-            if (pathIndex >= pathPercentages.length) {
+            if (pathIndex >= catMullPaths.length) {
                 fixedPointerRef.current = undefined;
                 return;
             }
+
             if (!fixedPointerRef.current) {
                 fixedPointerRef.current = new THREE.Vector2();
             }
-            const randomPoint = paths[pathIndex]?.getPointAt(pathPercentages[pathIndex]);
 
-            fixedPointerRef.current.x = randomPoint.x;
-            fixedPointerRef.current.y = randomPoint.y;
+            const pathPoint = catMullPaths[pathIndex].catMulPath.getPointAt(percentage);
+            fixedPointerRef.current.x = pathPoint.x;
+            fixedPointerRef.current.y = pathPoint.y;
 
-            pathPercentages[pathIndex] += pathEpsilons[pathIndex];
-            if (pathPercentages[pathIndex] >= 1) pathIndex += 1;
+            const epsilon = 1 / (catMullPaths[pathIndex].catMulPath.getLength() * 20);
+            percentage += epsilon;
+            if (percentage >= 1) {
+                percentage = 0;
+                pathIndex += 1;
+            }
         }
 
         function mouseSin() {
@@ -625,13 +800,14 @@ export function ThreeCanvas({
 
             fixedPointerRef.current.y = Math.sin(fixedPointerRef.current.x * 10);
         }
-
+*/
         function animate() {
             // mouseSin();
-            nextPointerPosition();
+            // nextPointerPosition();
+            // nextPathPoint();
             timer.update();
 
-            updateCameraPercentage(cameraTargetPercentage.current);
+            // updateCameraPercentage(cameraTargetPercentage.current);
             // compute particles
             renderer.compute(updateParticles);
             renderer.compute(spawnParticles);
@@ -658,6 +834,15 @@ export function ThreeCanvas({
             previousSpawnPosition.value.copy(spawnPosition.value);
             // @ts-ignore
             spawnPosition.value.lerp(scenePointer, 0.1);
+            // @ts-ignore
+            // previousSpawnPosition.value.copy(spawnPosition.value);
+
+            // Particles
+            timeScale.value = timeScaleRef.current;
+            particleLifetime.value = lifetimeRef.current;
+            linksWidth.value = linksWidthRef.current;
+            particleSize.value = sizeRef.current;
+            nbToSpawn.value = Math.max(nbToSpawn.value - 1, spawnRef.current);
 
             // rotating colors
             colorOffset.value = colorOffsetRef.current;
@@ -665,14 +850,14 @@ export function ThreeCanvas({
             // Turbulence
             turbFriction.value = frictionRef.current;
             turbFrequency.value = frequencyRef.current;
-            turbAmplitude.value = amplitudeRef.current;
+            turbAmplitude.value = Math.max(turbAmplitude.value - 0.1, amplitudeRef.current);
             turbOctaves.value = octavesRef.current;
             turbLacunarity.value = lacunarityRef.current;
             turbGain.value = gainRef.current;
 
             // Bloom
             bloomPass.threshold.value = bloomThresholdRef.current;
-            bloomPass.strength.value = bloomStrengthRef.current;
+            bloomPass.strength.value = Math.max(bloomPass.strength.value - 0.1, bloomStrengthRef.current);
             bloomPass.radius.value = bloomRadiusRef.current;
 
             // colorOffset.value +=
@@ -688,7 +873,37 @@ export function ThreeCanvas({
             controls.update();
             postProcessing.render();
         }
+        /*
+        let prevX = 0;
+        let prevY = 0;
+        let intensity = 0;
+        const mouseMoveHandler = (event: MouseEvent) => {
+            if (!canvasRef.current) return;
 
+            const rect = canvasRef.current.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            // if no previous position, set it to current
+            if (prevX === 0 && prevY === 0) {
+                prevX = x;
+                prevY = y;
+            }
+            const deltaX = x - prevX;
+            const deltaY = y - prevY;
+            intensity = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            intensity = Math.min(intensity * 50, 1); // scale and clamp intensity
+
+            //turbAmplitude.value = Math.min(turbAmplitude.value + intensity, 5);
+            nbToSpawn.value = Math.min(nbToSpawn.value + intensity, 5);
+            bloomPass.strength.value = Math.min(bloomPass.strength.value + intensity * 0.2, 3);
+
+            prevX = x;
+            prevY = y;
+        };
+
+        document.addEventListener('mousemove', mouseMoveHandler);
+        */
         return () => {
             try {
                 // console.log('calling renderer', stats.dom);
@@ -696,6 +911,7 @@ export function ThreeCanvas({
                 // stats.end();
                 gui?.destroy();
                 renderer?.dispose();
+                // document.removeEventListener('mousemove', mouseMoveHandler);
             } catch (e) {
                 //
             }
